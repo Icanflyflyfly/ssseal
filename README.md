@@ -1,1 +1,1 @@
-# ssseal
+# seal
