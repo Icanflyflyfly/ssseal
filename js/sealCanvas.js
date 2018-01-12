@@ -4,6 +4,8 @@ function createSeal(config){
     createSealDang(config);
   }else if(id == 'general_42_gh'){
     createSealGongHui(config);
+  }else if(id == 'general_40_tuan'){
+    createSealGongHui(config);
   }else {
     createSealCommon(config);
   }
@@ -47,7 +49,7 @@ function createSealCommon(config){
     context.fillStyle = '#000';
 
     var sealnameAdjust = parseInt(config.sealnameAdjust||40);
-    context.fillText(config.name,width,height+sealnameAdjust,70);
+    context.fillText(config.name,width,height+sealnameAdjust,config.sealnameFontAdjust||80);
     context.restore();
 
     // 绘制印章单位
@@ -71,7 +73,7 @@ function createSealCommon(config){
     }
 
     // 绘制编号
-    context.font = 'bold '+(config.sealnoSize||12) +'px serif';
+    context.font = 'normal normal 900 '+(config.sealnoSize||12) +'px serif';
     context.fillStyle = '#000';
     var count2 = config.sealNum.length;// 字数
     var angle2 = config.sealnoAngle||Math.PI/(2.2*(count2 - 1));// 字间角度
@@ -99,6 +101,7 @@ function createSealCommon(config){
      */
     function create5star(context,sx,sy,radius,color,rotato){
         context.save();
+        context.translate(0.5,0.5);// 平移到此位置,
         context.fillStyle=color;
         context.translate(sx,sy);//移动坐标原点
         context.rotate(Math.PI+rotato);//旋转
@@ -127,38 +130,48 @@ function createSealGongHui(config){
     var canvas = document.getElementById(config.canvasId);
     canvas.height=canvas.height;//清除画布
     var context = canvas.getContext('2d');
+    context.translate(0.5,0.5);// 平移到此位置,
+
+    context.mozImageSmoothingEnabled = true;
+    context.webkitImageSmoothingEnabled = true;
+    context.msImageSmoothingEnabled = true;
+    context.imageSmoothingEnabled = true;
+
+
+    context.scale(10,10);
 
     // 绘制印章边框
-    var width=canvas.width/2;
-    var height=canvas.height/2;
-    context.lineWidth=config.lineWidth||4;
-    context.strokeStyle="#f00";
+    var width=canvas.width/20;
+    var height=canvas.height/20;
+
+    context.lineWidth=config.lineWidth||2.5;
+    context.strokeStyle="#000";
     context.beginPath();
-    context.arc(width,height,config.lineSize||80,0,Math.PI*2);
+    context.arc(width,height,config.lineSize||98,0,Math.PI*2);
     context.stroke();
 
     // 绘制印章内边框
-    context.lineWidth=config.lineWidth2||3;
-    context.strokeStyle="#f00";
+    context.lineWidth=config.lineWidth2||2.5;
+    context.strokeStyle="#000";
     context.beginPath();
-    context.arc(width,height,config.lineSize2||75,0,Math.PI*2);
+    context.arc(width,height,config.lineSize2||94,0,Math.PI*2);
     context.stroke();
 
     //画五角星
-    create5star(context,width,height,config.star5||20,"#f00",0);
+    create5star(context,width,height,config.star5||20,"#000",0);
 
     // 绘制印章名称
-    context.font = (config.sealnameSize||22)+'px serif';
+    context.font = 'bold '+(config.sealnameSize||22)+'px serif';
     context.textBaseline = 'middle';//设置文本的垂直对齐方式
     context.textAlign = 'center'; //设置文本的水平对对齐方式
-    context.lineWidth=1;
-    context.fillStyle = '#f00';
-    context.fillText(config.name,width,height+40,70);
+    context.fillStyle = '#000';
+    var sealnameAdjust = parseInt(config.sealnameAdjust||40);
+    context.fillText(config.name,width,height+sealnameAdjust,config.sealnameFontAdjust||80);
     context.restore();
 
     // 绘制印章单位
     context.translate(width,height);// 平移到此位置,
-    context.font = (config.sealunitSize||22)+'px serif ';
+    context.font = 'bold '+(config.sealunitSize||22)+'px serif ';
     var count = config.company.length;// 字数
     var angle = config.sealangleSize||4*Math.PI/(3*(count - 1));// 字间角度
     var chars = config.company.split("");
@@ -172,12 +185,12 @@ function createSealGongHui(config){
         context.save();
         context.translate(90, 0);// 平移到此位置,此时字和x轴垂直
         context.rotate(Math.PI/2);// 旋转90度,让字平行于x轴
-        context.fillText(c,0, 30,config.sealunitHeight||15);// 此点为字的中心点
+        context.fillText(c,0, config.sealunitSpan||14,config.sealunitHeight||15);// 此点为字的中心点
         context.restore();
     }
 
     // 绘制编号
-    context.font = (config.sealnoSize||12) +'px serif';
+    context.font = 'normal normal 900 '+(config.sealnoSize||12) +'px serif';
     context.fillStyle = '#000';
     var count2 = config.sealNum.length;// 字数
     var angle2 = config.sealnoAngle||Math.PI/(2.3*(count2 - 1));// 字间角度
@@ -193,7 +206,7 @@ function createSealGongHui(config){
         context.save();
          context.translate(90, 0);// 平移到此位置,此时字和x轴垂直
         context.rotate(270*Math.PI/180);// 旋转90度,让字平行于x轴
-        context.fillText(c2,0, -23);// 此点为字的中心点
+        context.fillText(c2,0, config.sealnoSpan||-4);// 此点为字的中心点
         context.restore();
     }
 
@@ -233,32 +246,45 @@ function createSealDang(config){
     canvas.height=canvas.height;//清除画布
     var context = canvas.getContext('2d');
 
+    context.mozImageSmoothingEnabled = true;
+    context.webkitImageSmoothingEnabled = true;
+    context.msImageSmoothingEnabled = true;
+    context.imageSmoothingEnabled = true;
+
+
+    context.scale(10,10);
+
     // 绘制印章边框
-    var width=canvas.width/2;
-    var height=canvas.height/2;
-    context.lineWidth=config.lineWidth||4;
-    context.strokeStyle="#f00";
+    var width=canvas.width/20;
+    var height=canvas.height/20;
+    context.translate(0.5,0.5);// 平移到此位置,
+
+    context.lineWidth = config.lineWidth||2.5;
     context.beginPath();
-    context.arc(width,height,config.lineSize||80,0,Math.PI*2);
+    context.arc(width,height,config.lineSize||98,0,Math.PI*2);
     context.stroke();
+    context.closePath();
 
     context.save();
 
     var img = new Image();
-    img.src = './images/dang.png';
+    // img.setAttribute("crossOrigin",'*');
+    img.src = 'file:///./images/dang.png';
     img.onload = function () {
         context.rotate(225*Math.PI/180);//旋转
         context.drawImage(img,-(img.width/3),-((img.height/3)+5),50,50);
     };
     context.restore();
 
+    context.translate(0.5,0.5);// 平移到此位置,
     // 绘制印章名称
-    context.font = (config.sealnameSize||22)+'px serif';
+    context.font = 'bold '+(config.sealnameSize||22)+'px serif';
     context.textBaseline = 'middle';//设置文本的垂直对齐方式
     context.textAlign = 'center'; //设置文本的水平对对齐方式
     context.lineWidth=1;
-    context.fillStyle = '#f00';
-    context.fillText(config.name,width,height+40,70);
+    context.fillStyle = '#000';
+    var sealnameAdjust = parseInt(config.sealnameAdjust||40);
+    context.fillText(config.name,width,height+sealnameAdjust,config.sealnameFontAdjust||80);
     context.restore();
 
 
@@ -284,7 +310,7 @@ function createSealDang(config){
 
     // 绘制编号
 
-    context.font = (config.sealnoSize||12) +'px serif';
+    context.font = 'normal normal 900 '+(config.sealnoSize||12) +'px serif';
     context.fillStyle = '#000';
 
     var count2 = config.sealNum.length;// 字数
@@ -360,7 +386,7 @@ function unitConversion() {
 
       var context = canvas.getContext('2d');
       context.lineWidth=3;
-      context.strokeStyle="#f00";
+      context.strokeStyle="#000";
 
       var k = (width/0.75)/2,
       w = width/2,
@@ -376,7 +402,7 @@ function unitConversion() {
       // 绘制印章单位
       context.translate(x,y);// 平移到此位置,
       context.font = '16px serif ';
-      context.strokeStyle="#f00";
+      context.strokeStyle="#000";
       var count = company.length;// 字数
       var angle = 4*Math.PI/(4.1*(count - 1));// 字间角度
       // alert(angle);
@@ -436,7 +462,7 @@ function unitConversion() {
 
     //使用strokeRect方法
     context.lineWidth=7;
-    context.strokeStyle = "#F00";
+    context.strokeStyle = "#000";
     context.strokeRect(x,y,l,l);
     context.save();
 
@@ -447,7 +473,7 @@ function unitConversion() {
     context.textBaseline = 'middle';//设置文本的垂直对齐方式
     context.textAlign = 'center'; //设置文本的水平对对齐方式
     // context.lineWidth=1;
-    context.fillStyle = '#f00';
+    context.fillStyle = '#000';
     var bian = 10;
     height = height - 5;
     context.fillText(chars[0],width+l/3-bian,height-l/3+bian);
@@ -463,9 +489,7 @@ function unitConversion() {
 
   }
 
-  function createSeal8(id,company,name){
-
-      var unitCon = new unitConversion()
+  function createSealTuan(id,company,name){
 
       var canvas = document.getElementById(id);
       canvas.height=canvas.height;//清除画布
@@ -475,7 +499,7 @@ function unitConversion() {
       var width=canvas.width/2;
       var height=canvas.height/2;
       context.lineWidth=7;
-      context.strokeStyle="#f00";
+      context.strokeStyle="#000";
       context.beginPath();
       context.arc(width,height,110,0,Math.PI*2);
       context.stroke();
@@ -491,14 +515,14 @@ function unitConversion() {
       context.stroke();
 
       //画五角星
-      create5star(context,width,height,20,"#f00",0);
+      create5star(context,width,height,20,"#000",0);
 
       // 绘制印章名称
       context.font = '17px serif';
       context.textBaseline = 'middle';//设置文本的垂直对齐方式
       context.textAlign = 'center'; //设置文本的水平对对齐方式
       context.lineWidth=1;
-      context.fillStyle = '#f00';
+      context.fillStyle = '#000';
       context.fillText(name,width,height+38);
       context.restore();
 
@@ -507,7 +531,7 @@ function unitConversion() {
       context.textBaseline = 'middle';//设置文本的垂直对齐方式
       context.textAlign = 'center'; //设置文本的水平对对齐方式
       context.lineWidth=1;
-      context.fillStyle = '#f00';
+      context.fillStyle = '#000';
       context.fillText('委员会',width,height+65);
       context.restore();
 
@@ -566,6 +590,7 @@ function unitConversion() {
        */
       function create5star(context,sx,sy,radius,color,rotato){
           context.save();
+          context.translate(0.5,0.5);// 平移到此位置,
           context.fillStyle=color;
           context.translate(sx,sy);//移动坐标原点
           context.rotate(Math.PI+rotato);//旋转

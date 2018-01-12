@@ -4,14 +4,14 @@
 var sealSizeParas = {
     line_size:98,
     sealunit_span:9,
-    sealno_span:1,
+    sealno_span:-1,
     sealunit_size:36,
     sealno_size:16,
     sealangle_size:function(companyName_new){
       return (4*Math.PI/(3*((companyName_new.length) - 1))).toFixed(3);
     },
-    sealname_adjust:53,
-    sealname_size:36
+    sealname_adjust:50,
+    sealname_size:38
 }
 
 jQuery(function($) {
@@ -57,32 +57,19 @@ jQuery(function($) {
         var companyName_new = $('#companyName').val();
         id = 'general_42';
         sealName = '合同专用章';
-        $('#line_size').val(seal_42);
-        $('#sealunit_span').val(25);
-        $('#sealno_span').val(18);
-        $('#sealname_size').val(24);
-        $('#sealunit_size').val(24);
-        $('#sealno_size').val(12);
-        $('#sealname_adjust').val(40);
-        $('#sealangle_size').val((4*Math.PI/(3*((companyName_new.length) - 1))).toFixed(3));
 
+        $('#sealangle_size').val(sealSizeParas.sealangle_size(companyName_new));
         var paras = preHandle();
         createSeal(paras);
+
       });
 
       $('#general_42_dang').click(function(){
         var companyName_new = $('#companyName').val();
         id = 'general_42_dang';
         sealName = '支部委员会';
-        $('#line_size').val(seal_42);
-        $('#sealunit_span').val(25);
-        $('#sealno_span').val(18);
-        $('#sealname_size').val(24);
-        $('#sealunit_size').val(24);
-        $('#sealno_size').val(12);
-        $('#sealname_adjust').val(40);
-        $('#sealangle_size').val((4*Math.PI/(3*((companyName_new.length) - 1))).toFixed(3));
 
+        $('#sealangle_size').val(sealSizeParas.sealangle_size(companyName_new));
         var paras = preHandle();
         createSeal(paras);
       });
@@ -91,18 +78,16 @@ jQuery(function($) {
         var companyName_new = $('#companyName').val();
         id = 'general_42_gh';
         sealName = '工会委员会';
-        $('#line_size').val(seal_42);
-        $('#sealunit_span').val(25);
-        $('#sealno_span').val(18);
-        $('#sealname_size').val(24);
-        $('#sealunit_size').val(24);
-        $('#sealno_size').val(10);
-        $('#sealname_adjust').val(40);
-        $('#sealangle_size').val((4*Math.PI/(3*((companyName_new.length) - 1))).toFixed(3));
+
+        $('#sealunit_size').val(34);
+        $('#sealname_size').val(36);
+        $('#sealunit_span').val(14);
+        $('#sealno_span').val(-4);
+        $('#sealangle_size').val(sealSizeParas.sealangle_size(companyName_new));
 
         var paras = preHandle();
-        paras['lineWidth2'] = 3;
-        paras['lineSize2'] = 74;
+        paras['lineWidth2'] = 2.5;
+        paras['lineSize2'] = 94;
         createSeal(paras);
       });
 
@@ -171,6 +156,7 @@ jQuery(function($) {
         var star5 = $('#star5').val();
         var sealname_size = $('#sealname_size').val();
         var sealname_adjust = $('#sealname_adjust').val();
+        var sealname_font_adjust = $('#sealname_font_adjust').val();
         var sealunit_size = $('#sealunit_size').val();
         var sealangle_size = $('#sealangle_size').val();
         var sealrotate_size = $('#sealrotate_size').val();
@@ -182,6 +168,7 @@ jQuery(function($) {
         var sealno_span = $('#sealno_span').val();
         var seal_inborder = $('#seal_inborder').val();
         var seal_inborder_size = $('#seal_inborder_size').val();
+
         var width = $(window).width();
         var height = $(window).height();
 
@@ -196,6 +183,7 @@ jQuery(function($) {
             star5:star5,
             sealnameSize:sealname_size,
             sealnameAdjust:sealname_adjust,
+            sealnameFontAdjust:sealname_font_adjust,
             sealunitSize:sealunit_size,
             sealangleSize:sealangle_size,
             sealrotateSize:sealrotate_size,
@@ -204,7 +192,7 @@ jQuery(function($) {
             sealnoAngle:sealno_angle,
             sealnorotateSize:sealnorotate_size,
             sealunitSpan:sealunit_span,
-            sealnoSpan:-sealno_span,
+            sealnoSpan:sealno_span,
             lineWidth2:seal_inborder,
             lineSize2:seal_inborder_size,
             canvasWidth : width,
@@ -419,6 +407,24 @@ jQuery(function($) {
         createSeal(paras);
       });
 
+      /*印章名称高度调节*/
+      $('#sealname_adjust_font_up').click(function(){
+          var sealname_adjust = $('#sealname_font_adjust').val();
+          var sealname_adjustInt = parseInt(sealname_adjust);
+          $('#sealname_font_adjust').val(sealname_adjustInt+1);
+
+          var paras = preHandle();
+          createSeal(paras);
+      });
+      $('#sealname_adjust_font_down').click(function(){
+        var sealname_adjust = $('#sealname_font_adjust').val();
+        var sealname_adjustInt = parseInt(sealname_adjust);
+        $('#sealname_font_adjust').val(sealname_adjustInt-1);
+
+        var paras = preHandle();
+        createSeal(paras);
+      });
+
 
       /*印章单位字体设置*/
       $('#sealunit_size_bigger').click(function(){
@@ -617,6 +623,10 @@ jQuery(function($) {
             sealImage = '154px';
           }else if(id == 'general_38'){
             sealImage = '145px';
+          }else if(id == 'general_42'){
+            sealImage = '162px';
+          }else if(id == 'general_42_gh'){
+            sealImage = '162px';
           }
 
           $('#seal_image').attr('src',imgURI);
