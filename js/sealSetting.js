@@ -2,117 +2,262 @@
   2000
 */
 var sealSizeParas = {
-    line_size:98,
-    sealunit_span:9,
-    sealno_span:-1,
+    line_size:96,
+    sealunit_span:14,
+    sealno_span:3,
     sealunit_size:36,
-    sealno_size:16,
+    sealno_size:11,
     sealangle_size:function(companyName_new){
       return (4*Math.PI/(3*((companyName_new.length) - 1))).toFixed(3);
     },
-    sealname_adjust:50,
-    sealname_size:38
+    sealname_adjust:47,
+    sealname_size:36,
+    line_width:6,
+    star5:25,
+    width:332,//canvas宽
+    height:332,//canvas高
+    multiple:9,//canvas放大倍数
+    line_num:20,//边纹数量
+    sealno_angle:0.0834,//编码间距
+    sealrotate_size:(5*Math.PI/6).toFixed(3),//单位名称旋转角度
+    sealnorotate_size:Math.PI/9,
+    sealname_font_adjust:90
 }
 
 jQuery(function($) {
+
       var companyName = '承德印诺系统集成有限公司';
       var sealNum = '13080000000';
       var sealName = '';
 
-      $('#line_size').val(sealSizeParas.line_size);
-      $('#sealunit_span').val(sealSizeParas.sealunit_span);
-      $('#sealno_span').val(sealSizeParas.sealno_span);
-      $('#sealunit_size').val(sealSizeParas.sealunit_size);
-      $('#sealno_size').val(sealSizeParas.sealno_size);
-      $('#sealname_adjust').val(sealSizeParas.sealname_adjust);
-      $('#sealname_size').val(sealSizeParas.sealname_size);
+      /*
+      * 公共参数设定
+      */
+      function commonSetting(){
+          $('#line_size').val(sealSizeParas.line_size);
+          $('#line_num').val(sealSizeParas.line_num);
+          $('#sealunit_span').val(sealSizeParas.sealunit_span);
+          $('#sealunit_size').val(sealSizeParas.sealunit_size);
+          $('#sealno_span').val(sealSizeParas.sealno_span);
+          $('#sealnorotate_size').val(sealSizeParas.sealnorotate_size);
+          $('#sealno_size').val(sealSizeParas.sealno_size);
+          $('#sealname_adjust').val(sealSizeParas.sealname_adjust);
+          $('#sealname_size').val(sealSizeParas.sealname_size);
+          $('#line_width').val(sealSizeParas.line_width);
+          $('#sealno_angle').val(sealSizeParas.sealno_angle);
+          $('#sealrotate_size').val(sealSizeParas.sealrotate_size);
+          $('#sealname_font_adjust').val(sealSizeParas.sealname_font_adjust);
 
-      var line_size = 98;
-      var seal_38 = 98;
-      var seal_42 = 80;
+          var companyName_new = $('#companyName').val();
+          $('#sealangle_size').val(sealSizeParas.sealangle_size(companyName_new));
+          $('#star5').val(sealSizeParas.star5);
+      }
+
+      /**
+      *  横排文字
+      */
+      function settingRowText(bol){
+          if(bol == false){
+            $('#row_font_size_id').hide();
+            $('#row_adjust_id').hide();
+            $('#row_font_adjust_id').hide();
+          }else{
+            $('#row_font_size_id').show();
+            $('#row_adjust_id').show();
+            $('#row_font_adjust_id').show();
+          }
+      }
+
+      /**
+      *  横排文字
+      */
+      function specialSetting(id){
+          if(id == 'general_42_gh'){
+            $('#special_setting_id').show();
+          }else{
+            $('#special_setting_id').hide();
+          }
+      }
 
       var id = '';
-      $('#general_40').click(function(){
-        var companyName_new = $('#companyName').val();
+      $('#general_40').click(function(event,sealColor,satetyLine){
         id = 'general_40';
+        $('#curr_seal_name').text($('#general_40 .sealText').text());
         sealName = '';
-        $('#sealangle_size').val(sealSizeParas.sealangle_size(companyName_new));
+        settingRowText(false);
+        specialSetting();
+        commonSetting();
 
         var paras = preHandle();
+        if(sealColor){
+          paras['sealColor'] = sealColor;
+        }
+        if(satetyLine == false){
+          paras['satetyLine'] = satetyLine;
+        }
         createSeal(paras);
 
       });
 
-      $('#general_38').click(function(){
-        var companyName_new = $('#companyName').val();
+      $('#general_38').click(function(event,sealColor){
         id = 'general_38';
+        $('#curr_seal_name').text($('#general_38 .sealText').text());
         sealName = '账务专用章';
-
-        $('#sealangle_size').val(sealSizeParas.sealangle_size(companyName_new));
+        settingRowText(true);
+        specialSetting();
+        commonSetting();
         var paras = preHandle();
+        if(sealColor){
+          paras['sealColor'] = sealColor;
+        }
         createSeal(paras);
       });
 
-      $('#general_42').click(function(){
-        var companyName_new = $('#companyName').val();
+      $('#general_42').click(function(event,sealColor){
         id = 'general_42';
+        $('#curr_seal_name').text($('#general_42 .sealText').text());
         sealName = '合同专用章';
-
-        $('#sealangle_size').val(sealSizeParas.sealangle_size(companyName_new));
+        settingRowText(true);
+        specialSetting();
+        commonSetting();
         var paras = preHandle();
+        if(sealColor){
+          paras['sealColor'] = sealColor;
+        }
         createSeal(paras);
 
       });
 
-      $('#general_42_dang').click(function(){
+      $('#general_42_dang').click(function(event,sealColor){
         var companyName_new = $('#companyName').val();
         id = 'general_42_dang';
         sealName = '支部委员会';
-
+        settingRowText(true);
+        specialSetting();
+        commonSetting();
         $('#sealangle_size').val(sealSizeParas.sealangle_size(companyName_new));
         var paras = preHandle();
+        if(sealColor){
+          paras['sealColor'] = sealColor;
+        }
         createSeal(paras);
       });
 
-      $('#general_42_gh').click(function(){
-        var companyName_new = $('#companyName').val();
+      $('#general_42_gh').click(function(event,sealColor){
         id = 'general_42_gh';
+        $('#curr_seal_name').text($('#general_42_gh .sealText').text());
         sealName = '工会委员会';
+        settingRowText(true);
+        specialSetting(id);
+        commonSetting();
 
         $('#sealunit_size').val(34);
         $('#sealname_size').val(36);
         $('#sealunit_span').val(14);
-        $('#sealno_span').val(-4);
-        $('#sealangle_size').val(sealSizeParas.sealangle_size(companyName_new));
+        $('#sealno_span').val(7);
+        $('#sealunit_span').val(17);
+        $('#seal_inborder').val(3);
+        $('#seal_inborder_size').val(90);
+        $('#sealname_font_adjust').val(82);
 
         var paras = preHandle();
-        paras['lineWidth2'] = 2.5;
-        paras['lineSize2'] = 94;
+        if(sealColor){
+          paras['sealColor'] = sealColor;
+        }
         createSeal(paras);
       });
 
-      $('#general_40_tuan').click(function(){
+      $('#general_40_tuan').click(function(event,sealColor){
         id = 'general_40_tuan';
-        createSeal8('canvas_1','中国共产主义青年团','承德中滦煤化工有限公司');
-      });
+        $('#curr_seal_name').text($('#general_40_tuan .sealText').text());
+        sealName = '中国共产主义青年团';
+        commonSetting();
+        settingRowText(true);
+        specialSetting(id);
 
-      $('#general_40_cai').click(function(){
-        id = 'general_40_cai';
-        sealName = '账务专用章';
-        $('#line_size').val(seal_40);
-        $('#sealunit_span').val(27);
-        $('#sealno_span').val(22);
-        $('#sealname_size').val(22);
-        $('#sealno_size').val(12);
+        $('#sealno_span').val(3);
+        $('#sealunit_height').val(18);
+        $('#star5').val(20);
+        $('#sealname_size').val(20);
+        $('#sealname_adjust').val(38);
+        $('#sealname_font_adjust').val(145);
+        $('#sealunit_size').val(24);
+        $('#sealrotate_size').val((195*Math.PI/180).toFixed(3));
+        $('#sealunit_span').val(9);
+        $('#sealunit_height').val(15);
+
+        var companyName_new = $('#companyName').val();
+        $('#sealangle_size').val((Math.PI/(1.20*(companyName_new.length - 1))).toFixed(3));
+
+        $('#sealnorotate_size').val((Math.PI/2.8).toFixed(3));
 
         var paras = preHandle();
+        if(sealColor){
+          paras['sealColor'] = sealColor;
+        }
+        createSeal(paras);
+
+      });
+
+      $('#general_30_cai').click(function(event,sealColor){
+        id = 'general_30_cai';
+        $('#curr_seal_name').text($('#general_30_cai .sealText').text());
+        sealName = '账务专用章';
+        settingRowText(true);
+        specialSetting(id);
+        commonSetting();
+        var paras = preHandle();
+        if(sealColor){
+          paras['sealColor'] = sealColor;
+        }
         createSeal(paras);
       });
 
-      $('#general_20_faren').click(function(){
+      $('#general_20_faren').click(function(event,sealColor){
         id = 'general_20_faren';
-        createSeal7('canvas_1','测试用印','1308030013960');
+        $('#curr_seal_name').text($('#general_20_faren .sealText').text());
+        commonSetting();
+        settingRowText(false);
+        specialSetting(id);
+        $('#sealno_size').val(7);
+        var paras = preHandle();
+        paras['width'] = 138;
+        paras['height'] = 138;
+        if(sealColor){
+          paras['sealColor'] = sealColor;
+        }
+        createSeal(paras);
       });
+
+      $('#general_fapiao').click(function(event,sealColor){
+        id = 'general_fapiao';
+        $('#curr_seal_name').text($('#general_fapiao .sealText').text());
+        commonSetting();
+        settingRowText(false);
+        specialSetting(id);
+        var paras = preHandle();
+
+        if(sealColor){
+          paras['sealColor'] = sealColor;
+        }
+        createSeal(paras);
+      });
+
+
+      $('#general_baoguan').click(function(event,sealColor){
+        id = 'general_baoguan';
+        $('#curr_seal_name').text($('#general_fapiao .sealText').text());
+        commonSetting();
+        settingRowText(false);
+        specialSetting(id);
+        var paras = preHandle();
+
+        if(sealColor){
+          paras['sealColor'] = sealColor;
+        }
+        createSeal(paras);
+      });
+
 
 
       /*印章基本信息检查*/
@@ -132,8 +277,8 @@ jQuery(function($) {
           return false;
         }
 
-        if(sealNum_new.length != 11){
-          promot('请输入11位印章编号');
+        if(sealNum_new.length != 18){
+          promot('请输入18位印章编号');
           return false;
         }
 
@@ -151,6 +296,7 @@ jQuery(function($) {
         //返回参数
         var companyName_new = $('#companyName').val();
         var sealNum_new = $('#sealNum').val();
+        var line_num = $('#line_num').val();
         var lineWidth = $('#line_width').val();
         var lineSize = $('#line_size').val();
         var star5 = $('#star5').val();
@@ -178,6 +324,7 @@ jQuery(function($) {
             company:companyName_new,
             name:sealName,
             sealNum:sealNum_new,
+            lineNum:line_num,
             lineWidth:lineWidth,
             lineSize:lineSize,
             star5:star5,
@@ -192,11 +339,12 @@ jQuery(function($) {
             sealnoAngle:sealno_angle,
             sealnorotateSize:sealnorotate_size,
             sealunitSpan:sealunit_span,
-            sealnoSpan:sealno_span,
+            sealnoSpan:-sealno_span,
             lineWidth2:seal_inborder,
             lineSize2:seal_inborder_size,
-            canvasWidth : width,
-            canvasHeight : height
+            width : sealSizeParas.width,
+            height : sealSizeParas.height,
+            multiple : sealSizeParas.multiple
           };
           return paras;
       }
@@ -222,53 +370,82 @@ jQuery(function($) {
             createSeal(paras);
 
           }else if(id == 'general_40'){
-            $('#line_size').val(seal_40);
-            $('#sealname_size').val(22);
-            $('#sealunit_span').val(27);
-            $('#sealno_span').val(22);
-            $('#sealno_size').val(12);
-            $('#sealangle_size').val((4*Math.PI/(3*((companyName_new.length) - 1))).toFixed(3));
+            id = 'general_40';
+            sealName = '';
+            commonSetting();
+
+            var paras = preHandle();
+            createSeal(paras);
+          }else if(id == 'general_40_tuan'){
+            id = 'general_40_tuan';
+            $('#curr_seal_name').text($('#general_40_tuan .sealText').text());
+            sealName = '中国共产主义青年团';
+            commonSetting();
+            settingRowText(true);
+            specialSetting(id);
+
+            $('#sealno_span').val(3);
+            $('#sealunit_height').val(18);
+            $('#star5').val(20);
+            $('#sealname_size').val(20);
+            $('#sealname_adjust').val(38);
+            $('#sealname_font_adjust').val(145);
+            $('#sealunit_size').val(24);
+            $('#sealrotate_size').val((195*Math.PI/180).toFixed(3));
+            $('#sealunit_span').val(9);
+            $('#sealunit_height').val(15);
+
+            var companyName_new = $('#companyName').val();
+            $('#sealangle_size').val((Math.PI/(1.20*(companyName_new.length - 1))).toFixed(3));
+
+            $('#sealnorotate_size').val((Math.PI/2.8).toFixed(3));
 
             var paras = preHandle();
             createSeal(paras);
           }else if(id == 'general_38'){
-            $('#line_size').val(seal_38);
-            $('#sealname_size').val(20);
-            $('#sealunit_span').val(31);
-            $('#sealno_span').val(25);
-            $('#sealno_size').val(10);
-            $('#sealangle_size').val((4*Math.PI/(3*((companyName_new.length) - 1))).toFixed(3));
-
+            id = 'general_38';
+            sealName = '账务专用章';
+            commonSetting();
             var paras = preHandle();
             createSeal(paras);
           }else if(id == 'general_42'){
             id = 'general_42';
-            $('#line_size').val(seal_42);
-            $('#sealunit_span').val(25);
-            $('#sealno_span').val(18);
-            $('#sealname_size').val(24);
-            $('#sealunit_size').val(24);
-            $('#sealno_size').val(12);
-            $('#sealname_adjust').val(40);
-            $('#sealangle_size').val((4*Math.PI/(3*((companyName_new.length) - 1))).toFixed(3));
+            sealName = '合同专用章';
 
+            commonSetting();
             var paras = preHandle();
             createSeal(paras);
 
           }else if(id == 'general_42_gh'){
             id = 'general_42_gh';
-            $('#line_size').val(seal_42);
-            $('#sealunit_span').val(25);
-            $('#sealno_span').val(18);
-            $('#sealname_size').val(24);
-            $('#sealunit_size').val(24);
-            $('#sealno_size').val(10);
-            $('#sealname_adjust').val(40);
-            $('#sealangle_size').val((4*Math.PI/(3*((companyName_new.length) - 1))).toFixed(3));
+            sealName = '工会委员会';
+            commonSetting();
+
+            $('#sealunit_size').val(34);
+            $('#sealname_size').val(36);
+            $('#sealunit_span').val(14);
+            $('#sealno_span').val(7);
+            $('#sealunit_span').val(17);
+            $('#seal_inborder').val(3);
+            $('#seal_inborder_size').val(90);
+            $('#sealname_font_adjust').val(82);
 
             var paras = preHandle();
-            paras['lineWidth2'] = 3;
-            paras['lineSize2'] = 74;
+            createSeal(paras);
+          }else if(id == 'general_30_cai'){
+            id = 'general_30_cai';
+            sealName = '账务专用章';
+            commonSetting();
+            var paras = preHandle();
+            createSeal(paras);
+          }else if(id == 'general_20_faren'){
+            id = 'general_20_faren';
+            commonSetting();
+
+            $('#sealno_size').val(10);
+            var paras = preHandle();
+            paras['width'] = 138;
+            paras['height'] = 138;
             createSeal(paras);
           }
 
@@ -281,6 +458,24 @@ jQuery(function($) {
 
 
       //--------------------------setting start----------------------------------------------
+      /*边框粗细设置*/
+      $('#line_num_add').click(function(){
+        var line_num = $('#line_num').val();
+        var line_num = parseInt(line_num) + 2;
+        $('#line_num').val(line_num);
+
+          var paras = preHandle();
+          createSeal(paras);
+      });
+      $('#line_num_reduce').click(function(){
+          var line_num = $('#line_num').val();
+          var line_num = parseInt(line_num) - 2;
+          $('#line_num').val(line_num);
+
+          var paras = preHandle();
+          createSeal(paras);
+      });
+
       /*边框粗细设置*/
       $('#border_reduce').click(function(){
           var borderNum = $('#line_width').val();
@@ -604,10 +799,10 @@ jQuery(function($) {
       };
 
       $('#down_seal').click(function(){
-        var myCanvas = document.getElementById("canvas_1");
+        // var myCanvas = document.getElementById("canvas_1");
+        // var imgURI = myCanvas.toDataURL("image/png");
 
-        var imgURI = myCanvas.toDataURL("image/png");
-
+        var imgURI = $('#seal_image_down').attr('src');
         // 下载后的问题名
         var filename = 'yinzhang_' + (new Date()).getTime() + '.png' ;
         // download
@@ -619,6 +814,7 @@ jQuery(function($) {
           var imgURI = myCanvas.toDataURL("image/png");
 
           var sealImage = '154px';
+
           if(id == 'general_40'){
             sealImage = '154px';
           }else if(id == 'general_38'){
@@ -627,11 +823,42 @@ jQuery(function($) {
             sealImage = '162px';
           }else if(id == 'general_42_gh'){
             sealImage = '162px';
+          }else if(id == 'general_30_cai'){
+            sealImage = '114px';
+          }else if(id == 'general_20_faren'){
+            sealImage = '76px';
+          }else if(id == 'general_baoguan'){
+            sealImage = '190px';
           }
 
           $('#seal_image').attr('src',imgURI);
           $('#seal_image').attr('width',sealImage);
           $('#seal_image').attr('height',sealImage);
+
+          if(id == 'general_40'){
+            $('#general_40').trigger('click',['#F00']);
+          }else if(id == 'general_38'){
+            $('#general_38').trigger('click',['#F00']);
+          }else if(id == 'general_30_cai'){
+            $('#general_30_cai').trigger('click',['#F00']);
+          }else if(id == 'general_20_faren'){
+            $('#general_20_faren').trigger('click',['#F00']);
+          }else if(id == 'general_42'){
+            $('#general_42').trigger('click',['#F00']);
+          }else if(id == 'general_42_gh'){
+            $('#general_42_gh').trigger('click',['#F00']);
+          }else if(id == 'general_fapiao'){
+            $('#general_fapiao').trigger('click',['#F00']);
+          }else if(id == 'general_baoguan'){
+            $('#general_baoguan').trigger('click',['#F00']);
+          }
+
+          var myCanvasRed = document.getElementById("canvas_1");
+          var imgURIRed = myCanvasRed.toDataURL("image/png");
+
+          $('#seal_image_down').attr('src',imgURIRed);
+          $('#seal_image_down').attr('width',sealImage);
+          $('#seal_image_down').attr('height',sealImage);
 
       });
 
@@ -645,9 +872,14 @@ jQuery(function($) {
          });
      });
 
+
+
+     $('#preview_id').height($('#edit_id').height());
+
+
   });
 
 
 var conv = new unitConversion();
-var px1 = conv.mmConversionPx(38);
+var px1 = conv.mmConversionPx(50);
 console.log('px1 = '+px1);

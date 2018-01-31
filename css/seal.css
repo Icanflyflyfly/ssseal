@@ -1,24 +1,36 @@
+@font-face {
+    font-family: 'lishu';
+    src: url('../fonts/_.woff2') format('woff2'),
+         url('../fonts/_.woff') format('woff'),
+         url('../fonts/_.ttf') format('ttf');
+    font-weight: normal;
+    font-style: normal;
+}
+
 .title{
     margin: 0px 10px;
-    font-size:20px;
+    font-size:30px;
     color:blue;
     border: 1px solid #efefef;
+    font-family: 'lishu';
 }
 .preview{
     margin: 0px 10px;
-    font-size:20px;
+    font-size:30px;
     color:blue;
     float:left;
-    width:50%;
+    width:40%;
     border: 1px solid #efefef;
+    font-family: 'lishu';
 }
 .edit{
     margin: 0px 10px;
-    font-size:20px;
+    font-size:30px;
     color:blue;
     float:left;
-    width:45%;
+    width:55%;
     border: 1px solid #efefef;
+    font-family: 'lishu';
 }
 .headerButtons{
     margin:10px;
@@ -38,6 +50,7 @@
   text-align: center;
   display: block;
   color: #f00;
+  font-size:0.8em;
 }
 
 .headerButtons .buttonDiv{
@@ -62,8 +75,8 @@
 
 .canvasPanel{
     margin: 10px;
-    width: 50%;
-    height: 85%;
+    width: 40%;
+    height: 900px;
     border: 2px solid blue;
     display:flex;
     justify-content:center;
@@ -73,19 +86,18 @@
 
 .editPanel{
     margin: 10px;
-    width: 21%;
-    height: 85%;
+    width: 27%;
+    height: 900px;
     border: 2px solid blue;
     float:left;
     text-align: left;
 }
 .gen_seal_image{
     border: 1px solid blue;
-    margin: 5px;
     padding: 5px 0px;
     text-align: center;
-    line-height: 170px;
-    height: 170px;
+    line-height: 180px;
+    height: 180px;
 }
 .h4{
   padding:5px 10px;
