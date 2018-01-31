@@ -53,30 +53,49 @@ function createSealCommon(config){
 
     context.translate(0.5,0.5);// 平移到此位置,
 
+    var satefyLineArray = sealSizeParas['satefyLineArray'];
+    if(config.satefyLineRepaint){
+        satefyLineArray = new Array();
+    }
     //防伪线
-    if(config.satetyLine != false){
-      for(var i = 0; i < config.lineNum; i++) {
-          context.save();
-          //设置分刻度的粗细
-          context.lineWidth = 0.5;
-          //设置分刻度的颜色
-          context.strokeStyle = "#FFF";
-          //设置或者重置画布的0,0点
-          context.translate(width,height);
+    for(var i = 0; i < config.lineNum; i++) {
+        context.save();
+        //设置分刻度的粗细
+        context.lineWidth = config.lineSafetySize||0.5;
+        //设置分刻度的颜色
+        context.strokeStyle = "#FFF";
+        //开始绘制
+        context.beginPath();
+        //设置或者重置画布的0,0点
+        context.translate(width,height);
+        if(config.satefyLineRepaint){
+          var r1 = Math.random();
+          var r2 = Math.random();
+          var x2 = RandomNumBoth(-10,10);
           var rotate = RandomNumBoth(0,180/config.lineNum);
+
           //设置旋转的角度
           context.rotate((i*360/config.lineNum+rotate)*Math.PI/180);
-          //开始绘制
-          context.beginPath();
-          var x1 = RandomNumBoth(0,5);
-          context.moveTo(0,(-config.lineSize-2)+(Math.random()));
-          var x2 = RandomNumBoth(-10,10);
-          context.lineTo(x2,(-config.lineSize+1)+(Math.random()*3));
-          context.stroke();
-          context.closePath();
-          context.restore();
-      }
+          context.moveTo(0,(-config.lineSize-2)+(r1));
+          context.lineTo(x2,(-config.lineSize+1)+(r2*3));
+
+          var parasArray = new Array(r1,r2,x2,rotate);
+          satefyLineArray.push(parasArray);
+        }else{
+          var satefyLine = satefyLineArray[i];
+          //设置旋转的角度
+          context.rotate((i*360/config.lineNum+(satefyLine[3]))*Math.PI/180);
+          context.moveTo(0,(-config.lineSize-2)+(satefyLine[0]));
+          context.lineTo(satefyLine[2],(-config.lineSize+1)+(satefyLine[1]*3));
+        }
+
+        context.stroke();
+        context.closePath();
+        context.restore();
+
     }
+
+    sealSizeParas['satefyLineArray'] = satefyLineArray;
 
     context.lineWidth = config.lineWidth||2.5;
     context.beginPath();

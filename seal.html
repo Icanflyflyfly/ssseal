@@ -14,14 +14,14 @@
     <!--link href="css/print.css" rel="stylesheet"type="text/css" media="print"/-->
 
     <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
-    <script src="js/jquery-3.2.1.min.js"></script>
-    <script src="js/jquery.jqprint-0.3.js"></script>
+    <script type="text/javascript" src="js/jquery-3.2.1.min.js"></script>
+    <script type="text/javascript" src="js/jquery.jqprint-0.3.js"></script>
 
     <!-- Include all compiled plugins (below), or include individual files as needed -->
-    <script src="bootstrap3/js/bootstrap.min.js"></script>
-    <script src="js/sealCanvas.js"></script>
-
-
+    <script type="text/javascript" src="bootstrap3/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="js/sealSetting.js"></script>
+    <script type="text/javascript" src="js/sealCanvas.js"></script>    
+    <script type="text/javascript" src="js/jquery.colorpicker.js"></script>
 </head>
 <div class="title">
   样章选择区：
@@ -116,13 +116,26 @@
               <div class="form-group" style="margin-right:3px;">
                 <label for="line_num"  class="col-sm-4 primary center control-label">防伪纹线条数</label>
                 <div class="col-sm-3">
-                  <input id="line_num" type="number" class="form-control" value="10" readonly="true">
+                  <input id="line_num" type="number" class="form-control" value="16" readonly="true">
                 </div>
                 <button id="line_num_add" type="button" class="btn btn-default btn-sm">
                   <span class="glyphicon glyphicon-arrow-up"></span> 增加
                 </button>
                 <button id="line_num_reduce" type="button" class="btn btn-default btn-sm">
                   <span class="glyphicon glyphicon-arrow-down"></span> 减少
+                </button>
+              </div>
+
+              <div class="form-group" style="margin-right:3px;">
+                <label for="line_safety_size"  class="col-sm-4 primary center control-label">防伪纹线粗细</label>
+                <div class="col-sm-3">
+                  <input id="line_safety_size" type="number" class="form-control" value="0.5" readonly="true">
+                </div>
+                <button id="line_safety_size_add" type="button" class="btn btn-default btn-sm">
+                  <span class="glyphicon glyphicon-arrow-up"></span> 加粗
+                </button>
+                <button id="line_safety_size_reduce" type="button" class="btn btn-default btn-sm">
+                  <span class="glyphicon glyphicon-arrow-down"></span> 减细
                 </button>
               </div>
 
@@ -162,6 +175,16 @@
                 </button>
                 <button id="star5_smaller" type="button" class="btn btn-default btn-sm">
                   <span class="glyphicon glyphicon-arrow-down"></span> 减小
+                </button>
+              </div>
+
+              <div class="form-group" style="margin-right:3px;">
+                <label for="seal_color"  class="col-sm-4 primary center control-label">印章颜色</label>
+                <div class="col-sm-3">
+                  <input id="seal_color" type="text" class="form-control" value="#000000"/>
+                </div>
+                <button id="seal_color_img" type="button" class="btn btn-default btn-lg">
+                  <img src="images/colorpicker.png" style="cursor:pointer"/>
                 </button>
               </div>
 
@@ -414,14 +437,8 @@
 </div>
 
 </html>
-<script src="js/sealSetting.js"></script>
+
 <script language="javascript">
-//
-// var mm = conv.pxConversionMm(40);
-// console.log('mm = '+mm);
-//
-// var mm2 = conv.pxConversionMm(114);
-// console.log('mm2 = '+mm2);
 
 //新隶隶书简 法人章
 //发票专用章，要求
