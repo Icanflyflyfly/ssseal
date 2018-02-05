@@ -19,13 +19,14 @@ var sealSizeParas = {
     multiple:9,//canvas放大倍数
     line_num:16,//边纹数量
     sealno_angle:0.0834,//编码间距
-    sealrotate_size:(5*Math.PI/6).toFixed(3),//单位名称旋转角度
+    sealrotate_size:(5*Math.PI/6).toFixed(2),//单位名称旋转角度
     sealnorotate_size:Math.PI/9,//印章编号旋转角度
     sealname_font_adjust:90,//印章名称高低
     sealColor:'#000000',//印章颜色
     lineSafetySize:0.5,//防伪线粗细
     satefyLineArray:new Array(),
-    satefyLineRepaint:true
+    satefyLineRepaint:true,
+    faRenSatefyLine:new Array()
 }
 
 jQuery(function($) {
@@ -33,7 +34,7 @@ jQuery(function($) {
       var companyName = '承德印诺系统集成有限公司';
       var sealNum = '13080000000';
       var sealName = '';
-
+      $('#preview_id').height($('#edit_id').height());
       /*
       * 公共参数设定
       */
@@ -45,12 +46,12 @@ jQuery(function($) {
           $('#sealunit_span').val(sealSizeParas.sealunit_span);
           $('#sealunit_size').val(sealSizeParas.sealunit_size);
           $('#sealno_span').val(sealSizeParas.sealno_span);
-          $('#sealnorotate_size').val(sealSizeParas.sealnorotate_size);
+          $('#sealnorotate_size').val((sealSizeParas.sealnorotate_size).toFixed(2));
           $('#sealno_size').val(sealSizeParas.sealno_size);
           $('#sealname_adjust').val(sealSizeParas.sealname_adjust);
           $('#sealname_size').val(sealSizeParas.sealname_size);
           $('#line_width').val(sealSizeParas.line_width);
-          $('#sealno_angle').val(sealSizeParas.sealno_angle);
+          $('#sealno_angle').val((sealSizeParas.sealno_angle).toFixed(3));
           $('#sealrotate_size').val(sealSizeParas.sealrotate_size);
           $('#sealname_font_adjust').val(sealSizeParas.sealname_font_adjust);
 
@@ -62,7 +63,7 @@ jQuery(function($) {
       /*预处理*/
       function preHandle(){
         //参数检查
-        if(sealBaseInfoCheck() == false)return;
+        if(sealBaseInfoCheck() == false)return false;
         //返回参数
         var companyName_new = $('#companyName').val();
         var sealNum_new = $('#sealNum').val();
@@ -87,6 +88,12 @@ jQuery(function($) {
         var seal_inborder_size = $('#seal_inborder_size').val();
         var lineSafetySize = $('#line_safety_size').val();
         var satetyLine = sealSizeParas.satetyLine;
+        var sealangleSizeFapiao = $('#sealangle_size_fapiao').val();
+        var sealrotateSizeFapiao = $('#sealrotate_size_fapiao').val();
+        var sealNumFapiao = $('#sealNum_fapiao').val();
+        var sealFapiaoFont = $('#seal_fapiao_font').val();
+        var sealFapiaoAdjust = $('#seal_fapiao_adjust').val();
+        var sealBaoguanEnglish = $('#seal_baoguan_english').val();
 
         var width = $(window).width();
         var height = $(window).height();
@@ -120,7 +127,13 @@ jQuery(function($) {
             height : sealSizeParas.height,
             multiple : sealSizeParas.multiple,
             lineSafetySize:lineSafetySize,
-            satefyLineRepaint:sealSizeParas.satefyLineRepaint
+            satefyLineRepaint:sealSizeParas.satefyLineRepaint,
+            sealangleSizeFapiao:sealangleSizeFapiao,
+            sealrotateSizeFapiao:sealrotateSizeFapiao,
+            sealNumFapiao:sealNumFapiao,
+            sealFapiaoFont:sealFapiaoFont,
+            sealFapiaoAdjust:sealFapiaoAdjust,
+            sealBaoguanEnglish:sealBaoguanEnglish
           };
           return paras;
       }
@@ -144,10 +157,63 @@ jQuery(function($) {
       *  横排文字 设置
       */
       function specialSetting(id){
+          $('#star5_id').show();
+          $('#line_num_id').show();
+          $('#sealunit_height_id').show();
+          $('#sealangle_size_id').show();
+          $('#sealrotate_size_id').show();
+          $('#sealunit_span_id').show();
+
+          $('#sealno_angle_id').show();
+          $('#sealnorotate_size_id').show();
+          $('#sealno_span_id').show();
+          $('#special_setting_no_id').show();
+
+          $('#special_setting_id').hide();
+          $('#sealrotate_size_fapiao_id').hide();
+          $('#special_setting_fapiao_id').hide();
+          $('#special_setting_paoguan_id').hide();
+
           if(id == 'general_42_gh'){
             $('#special_setting_id').show();
-          }else{
-            $('#special_setting_id').hide();
+          }
+
+          if(id == 'general_20_faren'){
+            $('#star5_id').hide();
+            $('#line_num_id').hide();
+            $('#sealunit_height_id').hide();
+            $('#sealangle_size_id').hide();
+            $('#sealrotate_size_id').hide();
+            $('#sealunit_span_id').hide();
+
+            $('#sealno_angle_id').hide();
+            $('#sealnorotate_size_id').hide();
+            $('#sealno_span_id').hide();
+          }
+
+          if(id == 'general_42_dang' || id == 'general_fapiao' || id == 'general_baoguan'){
+            $('#star5_id').hide();
+          }
+
+          if(id == 'general_fapiao'){
+            $('#sealangle_size_id').hide();
+            $('#sealangle_size_fapiao_id').show();
+
+            $('#sealrotate_size_id').hide();
+            $('#sealrotate_size_fapiao_id').show();
+
+            $('#special_setting_fapiao_id').show();
+          }
+
+          if(id == 'general_baoguan'){
+            $('#sealangle_size_id').hide();
+            $('#sealangle_size_fapiao_id').show();
+
+            $('#sealrotate_size_id').hide();
+            $('#sealrotate_size_fapiao_id').show();
+
+            $('#special_setting_paoguan_id').show();
+            $('#special_setting_no_id').hide();
           }
       }
 
@@ -160,13 +226,7 @@ jQuery(function($) {
         specialSetting();
         commonSetting();
 
-        var paras = preHandle();
-        if(sealColor){
-          paras['sealColor'] = sealColor;
-        }
-
-        createSeal(paras);
-
+        createSeal(preHandle());
       });
 
       $('#general_38').click(function(event,sealColor){
@@ -176,12 +236,34 @@ jQuery(function($) {
         settingRowText(true);
         specialSetting();
         commonSetting();
-        var paras = preHandle();
-        if(sealColor){
-          paras['sealColor'] = sealColor;
-        }
-        createSeal(paras);
+
+        createSeal(preHandle());
       });
+
+      $('#general_30_cai').click(function(event,sealColor){
+        id = 'general_30_cai';
+        $('#curr_seal_name').text($('#general_30_cai .sealText').text());
+        sealName = '账务专用章';
+        settingRowText(true);
+        specialSetting(id);
+        commonSetting();
+
+        createSeal(preHandle());
+      });
+
+      $('#general_20_faren').click(function(){
+        id = 'general_20_faren';
+        $('#curr_seal_name').text($('#general_20_faren .sealText').text());
+        commonSetting();
+        settingRowText(false);
+        specialSetting(id);
+        $('#sealno_size').val(7);
+        $('#line_size').val(76);
+        $('#sealunit_size').val(34);
+
+        createSeal(preHandle());
+      });
+
 
       $('#general_42').click(function(event,sealColor){
         id = 'general_42';
@@ -190,27 +272,10 @@ jQuery(function($) {
         settingRowText(true);
         specialSetting();
         commonSetting();
+
         var paras = preHandle();
-        if(sealColor){
-          paras['sealColor'] = sealColor;
-        }
         createSeal(paras);
 
-      });
-
-      $('#general_42_dang').click(function(event,sealColor){
-        var companyName_new = $('#companyName').val();
-        id = 'general_42_dang';
-        sealName = '支部委员会';
-        settingRowText(true);
-        specialSetting();
-        commonSetting();
-        $('#sealangle_size').val(sealSizeParas.sealangle_size(companyName_new));
-        var paras = preHandle();
-        if(sealColor){
-          paras['sealColor'] = sealColor;
-        }
-        createSeal(paras);
       });
 
       $('#general_42_gh').click(function(event,sealColor){
@@ -230,11 +295,7 @@ jQuery(function($) {
         $('#seal_inborder_size').val(90);
         $('#sealname_font_adjust').val(82);
 
-        var paras = preHandle();
-        if(sealColor){
-          paras['sealColor'] = sealColor;
-        }
-        createSeal(paras);
+        createSeal(preHandle());
       });
 
       $('#general_40_tuan').click(function(event,sealColor){
@@ -261,71 +322,68 @@ jQuery(function($) {
 
         $('#sealnorotate_size').val((Math.PI/2.8).toFixed(3));
 
-        var paras = preHandle();
-        if(sealColor){
-          paras['sealColor'] = sealColor;
-        }
-        createSeal(paras);
+        createSeal(preHandle());
 
       });
 
-      $('#general_30_cai').click(function(event,sealColor){
-        id = 'general_30_cai';
-        $('#curr_seal_name').text($('#general_30_cai .sealText').text());
-        sealName = '账务专用章';
+      $('#general_42_dang').click(function(event,sealColor){
+        var companyName_new = $('#companyName').val();
+        id = 'general_42_dang';
+        sealName = '支部委员会';
         settingRowText(true);
         specialSetting(id);
         commonSetting();
-        var paras = preHandle();
-        if(sealColor){
-          paras['sealColor'] = sealColor;
-        }
-        createSeal(paras);
-      });
+        $('#sealangle_size').val(sealSizeParas.sealangle_size(companyName_new));
 
-      $('#general_20_faren').click(function(event,sealColor){
-        id = 'general_20_faren';
-        $('#curr_seal_name').text($('#general_20_faren .sealText').text());
-        commonSetting();
-        settingRowText(false);
-        specialSetting(id);
-        $('#sealno_size').val(7);
-        var paras = preHandle();
-        paras['width'] = 138;
-        paras['height'] = 138;
-        if(sealColor){
-          paras['sealColor'] = sealColor;
-        }
-        createSeal(paras);
+        createSeal(preHandle());
       });
 
       $('#general_fapiao').click(function(event,sealColor){
         id = 'general_fapiao';
+        sealName = '发票专用章';
         $('#curr_seal_name').text($('#general_fapiao .sealText').text());
         commonSetting();
-        settingRowText(false);
+        settingRowText(true);
         specialSetting(id);
-        var paras = preHandle();
 
-        if(sealColor){
-          paras['sealColor'] = sealColor;
-        }
-        createSeal(paras);
+        $('#sealunit_size').val(30);
+        $('#line_size').val(96);
+        $('#sealunit_height').val(15);
+        $('#sealangle_size_fapiao').val(180);
+        $('#sealrotate_size_fapiao').val(0);
+        $('#sealunit_span').val(4);
+        $('#sealname_size').val(30);
+        $('#sealname_font_adjust').val(80);
+        $('#sealname_adjust').val(83);
+        $('#sealno_size').val(8);
+        $('#sealno_span').val(-8);
+        $('#sealnorotate_size').val((Math.PI/2.9).toFixed(3));
+
+        var sealNum = $('#sealNum').val();
+        $('#sealno_angle').val((Math.PI/(3*(sealNum.length - 1))).toFixed(3));
+
+        createSeal(preHandle());
       });
-
 
       $('#general_baoguan').click(function(event,sealColor){
         id = 'general_baoguan';
+        sealName = '报关专用章';
         $('#curr_seal_name').text($('#general_fapiao .sealText').text());
         commonSetting();
-        settingRowText(false);
+        settingRowText(true);
         specialSetting(id);
-        var paras = preHandle();
 
-        if(sealColor){
-          paras['sealColor'] = sealColor;
-        }
-        createSeal(paras);
+        $('#sealunit_size').val(26);
+        $('#line_size').val(96);
+        $('#sealunit_height').val(12);
+        $('#sealangle_size_fapiao').val(-160);
+        $('#sealrotate_size_fapiao').val(-20);
+        $('#sealunit_span').val(3);
+        $('#sealname_size').val(32);
+        $('#sealname_font_adjust').val(100);
+        $('#sealname_adjust').val(50);
+
+        createSeal(preHandle());
       });
 
 
@@ -386,6 +444,8 @@ jQuery(function($) {
 
             var paras = preHandle();
             createSeal(paras);
+
+            $('#general_40').trigger();
           }else if(id == 'general_40_tuan'){
             id = 'general_40_tuan';
             $('#curr_seal_name').text($('#general_40_tuan .sealText').text());
@@ -595,7 +655,7 @@ jQuery(function($) {
 
       /*颜色设置*/
       $("#seal_color_img").colorpicker({
-          event:'mouseover',
+          event:'click',
           fillcolor:true,
           target:$("#seal_color"),
           success:function(o,color){
@@ -744,6 +804,8 @@ jQuery(function($) {
           createSeal(paras);
       });
 
+
+
       /*单位与边框间距*/
       $('#sealunit_span_bigger').click(function(){
           var sealunit_span = $('#sealunit_span').val();
@@ -833,6 +895,76 @@ jQuery(function($) {
           createSeal(paras);
       });
 
+      /*发票印章单位角度设置*/
+      $('#sealangle_bigger_fapiao').click(function(){
+          var sealangle_size_fapiao = $('#sealangle_size_fapiao').val();
+          var sealangle_size_fapiaoInt = parseFloat(sealangle_size_fapiao);
+          $('#sealangle_size_fapiao').val((sealangle_size_fapiaoInt+1));
+          var paras = preHandle();
+          createSeal(paras);
+      });
+      $('#sealangle_smaller_fapiao').click(function(){
+        var sealangle_size_fapiao = $('#sealangle_size_fapiao').val();
+        var sealangle_size_fapiaoInt = parseFloat(sealangle_size_fapiao);
+        $('#sealangle_size_fapiao').val((sealangle_size_fapiaoInt-1));
+
+          var paras = preHandle();
+          createSeal(paras);
+      });
+
+      /*发票印章单位旋转设置*/
+      $('#sealrotate_bigger_fapiao').click(function(){
+          var sealrotate_size_fapiao = $('#sealrotate_size_fapiao').val();
+          var ssealrotate_size_fapiaoFloat = parseInt(sealrotate_size_fapiao);
+          $('#sealrotate_size_fapiao').val((ssealrotate_size_fapiaoFloat+1));
+          var paras = preHandle();
+          createSeal(paras);
+      });
+      $('#sealrotate_smaller_fapiao').click(function(){
+        var sealrotate_size_fapiao = $('#sealrotate_size_fapiao').val();
+        var ssealrotate_size_fapiaoFloat = parseInt(sealrotate_size_fapiao);
+        $('#sealrotate_size_fapiao').val((ssealrotate_size_fapiaoFloat-1));
+
+          var paras = preHandle();
+          createSeal(paras);
+      });
+
+      /*发票横排编号大小*/
+      $('#seal_fapiao_font_bigger').click(function(){
+          var seal_fapiao_font = $('#seal_fapiao_font').val();
+          var seal_fapiao_fontInt = parseInt(seal_fapiao_font);
+          $('#seal_fapiao_font').val(seal_fapiao_fontInt+1);
+
+          var paras = preHandle();
+          createSeal(paras);
+      });
+      $('#seal_fapiao_font_smaller').click(function(){
+        var seal_fapiao_font = $('#seal_fapiao_font').val();
+        var seal_fapiao_fontInt = parseInt(seal_fapiao_font);
+        $('#seal_fapiao_font').val(seal_fapiao_fontInt-1);
+
+          var paras = preHandle();
+          createSeal(paras);
+      });
+
+      /*发票横排编号上下*/
+      $('#seal_fapiao_adjust_up').click(function(){
+          var seal_fapiao_adjust = $('#seal_fapiao_adjust').val();
+          var seal_fapiao_adjustInt = parseInt(seal_fapiao_adjust);
+          $('#seal_fapiao_adjust').val(seal_fapiao_adjustInt+1);
+
+          var paras = preHandle();
+          createSeal(paras);
+      });
+      $('#seal_fapiao_adjust_down').click(function(){
+          var seal_fapiao_adjust = $('#seal_fapiao_adjust').val();
+          var seal_fapiao_adjustInt = parseInt(seal_fapiao_adjust);
+          $('#seal_fapiao_adjust').val(seal_fapiao_adjustInt-1);
+
+          var paras = preHandle();
+          createSeal(paras);
+      });
+
       //--------------------------setting end----------------------------------------------
 
       function promot(promotText){
@@ -864,16 +996,14 @@ jQuery(function($) {
 
       /*生成印章*/
       $('#get_seal').click(function(){
-          sealSizeParas['satefyLineRepaint'] = false;
-
           var seallColor = sealSizeParas['sealColor'];
-          sealSizeParas['sealColor'] = '#FF0000';
+          $('#seal_color').val('#FF0000');
+          sealSizeParas['satefyLineRepaint'] = false;
+          if(createSeal(preHandle()) == false)return;
 
           var sealImage = '154px';
-
           if(id == 'general_40'){
             sealImage = '154px';
-            $('#general_40').trigger('click');
           }else if(id == 'general_38'){
             sealImage = '145px';
           }else if(id == 'general_42'){
@@ -881,7 +1011,7 @@ jQuery(function($) {
           }else if(id == 'general_42_gh'){
             sealImage = '162px';
           }else if(id == 'general_30_cai'){
-            sealImage = '114px';
+            sealImage = '114px'
           }else if(id == 'general_20_faren'){
             sealImage = '76px';
           }else if(id == 'general_baoguan'){
@@ -890,36 +1020,22 @@ jQuery(function($) {
 
           var myCanvas = document.getElementById("canvas_1");
           var imgURI = myCanvas.toDataURL("image/png");
-
           $('#seal_image_down').attr('src',imgURI);
           $('#seal_image_down').attr('width',sealImage);
           $('#seal_image_down').attr('height',sealImage);
 
-          sealSizeParas['sealColor'] = seallColor;
 
-          if(id == 'general_40'){
-            $('#general_40').trigger('click');
-          }else if(id == 'general_38'){
-            $('#general_38').trigger('click',['#F00']);
-          }else if(id == 'general_30_cai'){
-            $('#general_30_cai').trigger('click',['#F00']);
-          }else if(id == 'general_20_faren'){
-            $('#general_20_faren').trigger('click',['#F00']);
-          }else if(id == 'general_42'){
-            $('#general_42').trigger('click',['#F00']);
-          }else if(id == 'general_42_gh'){
-            $('#general_42_gh').trigger('click',['#F00']);
-          }else if(id == 'general_fapiao'){
-            $('#general_fapiao').trigger('click',['#F00']);
-          }else if(id == 'general_baoguan'){
-            $('#general_baoguan').trigger('click',['#F00']);
-          }
+          $('#seal_color').val(seallColor);
+
+          createSeal(preHandle());
 
           var myCanvas2 = document.getElementById("canvas_1");
           var imgURI2 = myCanvas2.toDataURL("image/png");
           $('#seal_image').attr('src',imgURI2);
           $('#seal_image').attr('width',sealImage);
           $('#seal_image').attr('height',sealImage);
+
+          sealSizeParas['satefyLineRepaint'] = true;
 
       });
 
@@ -932,8 +1048,6 @@ jQuery(function($) {
          });
      });
 
-
-     $('#preview_id').height($('#edit_id').height());
 
   });
 

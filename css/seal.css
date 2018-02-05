@@ -49,13 +49,14 @@
 .headerButtons .sealText{
   text-align: center;
   display: block;
-  color: #f00;
-  font-size:0.8em;
+  color: blue;
+  font-size:1.2em;
+  font-family: lishu;
 }
 
 .headerButtons .buttonDiv{
   width: 8%;
-  height: 15%;
+  height: 16%;
   float: left;
   padding: 10px;
   text-align: center;
@@ -76,7 +77,7 @@
 .canvasPanel{
     margin: 10px;
     width: 40%;
-    height: 900px;
+    height: 600px;
     border: 2px solid blue;
     display:flex;
     justify-content:center;
@@ -87,20 +88,23 @@
 .editPanel{
     margin: 10px;
     width: 27%;
-    height: 900px;
+    height: 1100px;
     border: 2px solid blue;
     float:left;
     text-align: left;
 }
 .gen_seal_image{
-    border: 1px solid blue;
+    border-top: 1px solid blue;
+    border-bottom: 1px solid blue;
     padding: 5px 0px;
     text-align: center;
     line-height: 180px;
     height: 180px;
 }
-.h4{
+.h4Text{
   padding:5px 10px;
-  color:blue;
+  color:#FF0000;
   border-bottom:1px solid blue;
+  font-family: 'lishu';
+  font-size: 26px;
 }

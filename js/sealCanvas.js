@@ -5,120 +5,163 @@ function createSeal(config){
   }else if(id == 'general_42_gh'){
     createSealGongHui(config);
   }else if(id == 'general_20_faren'){
+    config['width'] = 138;
+    config['height'] = 138;
     createSealFaren(config);
   }else if(id == 'general_40_tuan'){
     createSealTuan(config);
   }else if(id == 'general_fapiao'){
-    fapiao(config);
+    createSealFapiao(config);
   }else if(id == 'general_baoguan'){
     baoguan(config);
   }else {
     createSealCommon(config);
   }
 }
-
+/*随机数*/
 function RandomNumBoth(Min,Max){
     var Range = Max - Min;
     var Rand = Math.random();
     var num = Min + Math.round(Rand * Range); //四舍五入
     return num;
 }
+/*创建画布*/
+function canvasCreate(config){
+  var canvas = document.getElementById(config.canvasId);
+  canvas.style.display='block';
+  canvas.style.border='1px solid red';
+  canvas.height=canvas.height;//清除画布
+  canvas.setAttribute('width',config.width*config.multiple);
+  canvas.setAttribute('height',config.height*config.multiple);
+  canvas.style.width = config.width + 'px';
+  canvas.style.height = config.height + 'px';
+
+  var context = canvas.getContext('2d');
+  context.globalCompositeOperation = 'destination-over';
+
+  context.mozImageSmoothingEnabled = true;
+  context.webkitImageSmoothingEnabled = true;
+  context.msImageSmoothingEnabled = true;
+  context.imageSmoothingEnabled = true;
+
+  var scale = parseInt(config.multiple*5/3);
+  context.scale(scale,scale);
+
+  // 绘制印章边框
+  var width = parseInt(canvas.width/(scale*2));
+  var height = parseInt(canvas.height/(scale*2));
+
+  context.translate(0.5,0.5);// 平移到此位置,
+
+  config['context'] = context;
+  config['width'] = width;
+  config['height'] = height;
+
+  return config;
+}
+/*创建边纹线*/
+function safetyLineCreate(config){
+  var context = config['context'];
+
+  var satefyLineArray = sealSizeParas['satefyLineArray'];
+  if(config.satefyLineRepaint){
+      satefyLineArray.splice(0,satefyLineArray.length);
+  }
+  //防伪线
+  for(var i = 0; i < config.lineNum; i++) {
+      context.save();
+      //设置分刻度的粗细
+      context.lineWidth = config.lineSafetySize||0.5;
+      //设置分刻度的颜色
+      context.strokeStyle = "#FFF";
+      //开始绘制
+      context.beginPath();
+      //设置或者重置画布的0,0点
+      context.translate(config.width,config.height);
+      if(config.satefyLineRepaint || satefyLineArray.length==0){
+        var r1 = Math.random();
+        var r2 = Math.random();
+        var x2 = RandomNumBoth(-10,10);
+        var rotate = RandomNumBoth(0,180/config.lineNum);
+
+        //设置旋转的角度
+        context.rotate((i*360/config.lineNum+rotate)*Math.PI/180);
+        context.moveTo(0,(-config.lineSize-2)+(r1));
+        context.lineTo(x2,(-config.lineSize+1)+(r2*3));
+
+        var parasArray = new Array(r1,r2,x2,rotate);
+        satefyLineArray.push(parasArray);
+      }else{
+        var satefyLine = satefyLineArray[i];
+        //设置旋转的角度
+        context.rotate((i*360/config.lineNum+(satefyLine[3]))*Math.PI/180);
+        context.moveTo(0,(-config.lineSize-2)+(satefyLine[0]));
+        context.lineTo(satefyLine[2],(-config.lineSize+1)+(satefyLine[1]*3));
+      }
+
+      context.stroke();
+      context.closePath();
+      context.restore();
+
+  }
+
+  sealSizeParas['satefyLineArray'] = satefyLineArray;
+}
+
+//绘制五角星
+/**
+ * 创建一个五角星形状. 该五角星的中心坐标为(sx,sy),中心到顶点的距离为radius,rotate=0时一个顶点在对称轴上
+ * rotate:绕对称轴旋转rotate弧度
+ */
+function create5star(context,sx,sy,radius,color,rotato){
+    context.save();
+    context.translate(0.5,0.5);// 平移到此位置,
+    context.fillStyle=color;
+    context.translate(sx,sy);//移动坐标原点
+    context.rotate(Math.PI+rotato);//旋转
+
+    context.beginPath();//创建路径
+    var x = Math.sin(0);
+    var y= Math.cos(0);
+    var dig = Math.PI/5 *4;
+    for(var i = 0;i< 5;i++){//画五角星的五条边
+     var x = Math.sin(i*dig);
+     var y = Math.cos(i*dig);
+     context.lineTo(x*radius,y*radius);
+    }
+    context.closePath();
+    context.stroke();
+    context.fill();
+    context.restore();
+}
 
 /*创建公共印章*/
-function createSealCommon(config){
-
-    var canvas = document.getElementById(config.canvasId);
-    canvas.style.display='block';
-    canvas.style.border='1px solid red';
-    canvas.height=canvas.height;//清除画布
-    canvas.setAttribute('width',config.width*config.multiple);
-    canvas.setAttribute('height',config.height*config.multiple);
-    canvas.style.width = config.width + 'px';
-    canvas.style.height = config.height + 'px';
-
-    var context = canvas.getContext('2d');
-    context.globalCompositeOperation = 'destination-over';
-
-    context.mozImageSmoothingEnabled = true;
-    context.webkitImageSmoothingEnabled = true;
-    context.msImageSmoothingEnabled = true;
-    context.imageSmoothingEnabled = true;
-
-    var scale = parseInt(config.multiple*5/3);
-    context.scale(scale,scale);
-
-    // 绘制印章边框
-    var width = parseInt(canvas.width/(scale*2));
-    var height = parseInt(canvas.height/(scale*2));
-
-    context.translate(0.5,0.5);// 平移到此位置,
-
-    var satefyLineArray = sealSizeParas['satefyLineArray'];
-    if(config.satefyLineRepaint){
-        satefyLineArray = new Array();
-    }
-    //防伪线
-    for(var i = 0; i < config.lineNum; i++) {
-        context.save();
-        //设置分刻度的粗细
-        context.lineWidth = config.lineSafetySize||0.5;
-        //设置分刻度的颜色
-        context.strokeStyle = "#FFF";
-        //开始绘制
-        context.beginPath();
-        //设置或者重置画布的0,0点
-        context.translate(width,height);
-        if(config.satefyLineRepaint){
-          var r1 = Math.random();
-          var r2 = Math.random();
-          var x2 = RandomNumBoth(-10,10);
-          var rotate = RandomNumBoth(0,180/config.lineNum);
-
-          //设置旋转的角度
-          context.rotate((i*360/config.lineNum+rotate)*Math.PI/180);
-          context.moveTo(0,(-config.lineSize-2)+(r1));
-          context.lineTo(x2,(-config.lineSize+1)+(r2*3));
-
-          var parasArray = new Array(r1,r2,x2,rotate);
-          satefyLineArray.push(parasArray);
-        }else{
-          var satefyLine = satefyLineArray[i];
-          //设置旋转的角度
-          context.rotate((i*360/config.lineNum+(satefyLine[3]))*Math.PI/180);
-          context.moveTo(0,(-config.lineSize-2)+(satefyLine[0]));
-          context.lineTo(satefyLine[2],(-config.lineSize+1)+(satefyLine[1]*3));
-        }
-
-        context.stroke();
-        context.closePath();
-        context.restore();
-
-    }
-
-    sealSizeParas['satefyLineArray'] = satefyLineArray;
-
+function createSealCommon(cfg){
+    var config = canvasCreate(cfg);
+    safetyLineCreate(config);
+    var context = config['context'];
+    //画圆
     context.lineWidth = config.lineWidth||2.5;
     context.beginPath();
     context.strokeStyle = config.sealColor||'#000';
-    context.arc(width,height,config.lineSize||98,0,Math.PI*2);
+    context.arc(config.width,config.height,config.lineSize||98,0,Math.PI*2);
     context.stroke();
     context.closePath();
 
     //画五角星
-    create5star(context,width,height,config.star5||25,config.sealColor||"#000",0);
+    create5star(context,config.width,config.height,config.star5||25,config.sealColor||"#000",0);
 
     // 绘制印章名称
     context.font = 'bold '+(config.sealnameSize||22)+'px serif';
     context.textBaseline = 'middle';//设置文本的垂直对齐方式
     context.textAlign = 'center'; //设置文本的水平对对齐方式
     context.fillStyle = config.sealColor||'#000';
-
     var sealnameAdjust = parseInt(config.sealnameAdjust||40);
-    context.fillText(config.name,width,height+sealnameAdjust,config.sealnameFontAdjust||80);
+    context.fillText(config.name,config.width,config.height+sealnameAdjust,config.sealnameFontAdjust||80);
     context.restore();
 
     // 绘制印章单位
-    context.translate(width,height);// 平移到此位置,
+    context.translate(config.width,config.height);// 平移到此位置,
     context.font = 'bold '+(config.sealunitSize||22)+'px serif ';
     var count = config.company.length;// 字数
     var angle = config.sealangleSize||4*Math.PI/(3*(count - 1));// 字间角度
@@ -158,89 +201,19 @@ function createSealCommon(config){
         context.restore();
     }
 
-
-    //绘制五角星
-    /**
-     * 创建一个五角星形状. 该五角星的中心坐标为(sx,sy),中心到顶点的距离为radius,rotate=0时一个顶点在对称轴上
-     * rotate:绕对称轴旋转rotate弧度
-     */
-    function create5star(context,sx,sy,radius,color,rotato){
-        context.save();
-        context.translate(0.5,0.5);// 平移到此位置,
-        context.fillStyle=color;
-        context.translate(sx,sy);//移动坐标原点
-        context.rotate(Math.PI+rotato);//旋转
-
-        context.beginPath();//创建路径
-        var x = Math.sin(0);
-        var y= Math.cos(0);
-        var dig = Math.PI/5 *4;
-        for(var i = 0;i< 5;i++){//画五角星的五条边
-         var x = Math.sin(i*dig);
-         var y = Math.cos(i*dig);
-         context.lineTo(x*radius,y*radius);
-        }
-        context.closePath();
-        context.stroke();
-        context.fill();
-        context.restore();
-    }
 }
 
 /**
   工会委员会
 */
-function createSealGongHui(config){
-
-  var canvas = document.getElementById(config.canvasId);
-  canvas.style.display='block';
-  canvas.style.border='1px solid red';
-  canvas.height=canvas.height;//清除画布
-  canvas.setAttribute('width',config.width*config.multiple);
-  canvas.setAttribute('height',config.height*config.multiple);
-  canvas.style.width = config.width + 'px';
-  canvas.style.height = config.height + 'px';
-
-  var context = canvas.getContext('2d');
-  context.globalCompositeOperation = 'destination-over';
-
-    context.translate(0.5,0.5);// 平移到此位置,
-
-    context.mozImageSmoothingEnabled = true;
-    context.webkitImageSmoothingEnabled = true;
-    context.msImageSmoothingEnabled = true;
-    context.imageSmoothingEnabled = true;
-
-
-    var scale = parseInt(config.multiple*5/3);
-    context.scale(scale,scale);
+function createSealGongHui(cfg){
+    var config = canvasCreate(cfg);
+    safetyLineCreate(config);
+    var context = config['context'];
 
     // 绘制印章边框
-    var width=canvas.width/(scale*2);
-    var height=canvas.height/(scale*2);
-
-    for(var i = 0; i < config.lineNum; i++) {
-        context.save();
-        //设置分刻度的粗细
-        context.lineWidth = 0.5;
-        //设置分刻度的颜色
-        context.strokeStyle = "#FFF";
-        //设置或者重置画布的0,0点
-        context.translate(width,height);
-        var rotate = RandomNumBoth(0,180/config.lineNum);
-        //设置旋转的角度
-        context.rotate((i*360/config.lineNum+rotate)*Math.PI/180);
-        //开始绘制
-        context.beginPath();
-        var x1 = RandomNumBoth(0,5);
-        context.moveTo(0,(-config.lineSize-2)+(Math.random()));
-        var x2 = RandomNumBoth(-10,10);
-        context.lineTo(x2,(-config.lineSize+1)+(Math.random()*3));
-        context.stroke();
-        context.closePath();
-        context.restore();
-    }
-
+    var width=config.width;
+    var height=config.height;
     context.lineWidth=config.lineWidth||2.5;
     context.strokeStyle=config.sealColor||'#000';
     context.beginPath();
@@ -338,57 +311,18 @@ function createSealGongHui(config){
 /**
   支部委员会
 */
-function createSealDang(config){
-    var canvas = document.getElementById(config.canvasId);
-    canvas.style.display='block';
-    canvas.style.border='1px solid red';
-    canvas.height=canvas.height;//清除画布
-    canvas.setAttribute('width',config.width*config.multiple);
-    canvas.setAttribute('height',config.height*config.multiple);
-    canvas.style.width = config.width + 'px';
-    canvas.style.height = config.height + 'px';
-
-    var context = canvas.getContext('2d');
-    context.globalCompositeOperation = 'destination-over';
-
-    context.mozImageSmoothingEnabled = true;
-    context.webkitImageSmoothingEnabled = true;
-    context.msImageSmoothingEnabled = true;
-    context.imageSmoothingEnabled = true;
-
-    var scale = parseInt(config.multiple*5/3);
-    context.scale(scale,scale);
+function createSealDang(cfg){
+    var config = canvasCreate(cfg);
+    safetyLineCreate(config);
+    var context = config['context'];
 
     // 绘制印章边框
-    var width=canvas.width/(scale*2);
-    var height=canvas.height/(scale*2);
-    context.translate(0.5,0.5);// 平移到此位置,
-
-    for(var i = 0; i < config.lineNum; i++) {
-        context.save();
-        //设置分刻度的粗细
-        context.lineWidth = 0.5;
-        //设置分刻度的颜色
-        context.strokeStyle = "#FFF";
-        //设置或者重置画布的0,0点
-        context.translate(width,height);
-        var rotate = RandomNumBoth(0,180/config.lineNum);
-        //设置旋转的角度
-        context.rotate((i*360/config.lineNum+rotate)*Math.PI/180);
-        //开始绘制
-        context.beginPath();
-        var x1 = RandomNumBoth(0,5);
-        context.moveTo(0,(-config.lineSize-2)+(Math.random()));
-        var x2 = RandomNumBoth(-10,10);
-        context.lineTo(x2,(-config.lineSize+1)+(Math.random()*3));
-        context.stroke();
-        context.closePath();
-        context.restore();
-    }
-
+    var width=config.width;
+    var height=config.height;
 
     context.lineWidth = config.lineWidth||2.5;
     context.beginPath();
+    context.strokeStyle = config.sealColor||'#000';
     context.arc(width,height,config.lineSize||98,0,Math.PI*2);
     context.stroke();
     context.closePath();
@@ -466,75 +400,98 @@ function createSealDang(config){
   /**
     *法人章
   */
-  function createSealFaren(config){
-    var canvas = document.getElementById(config.canvasId);
-    canvas.style.display='block';
-    canvas.style.border='1px solid #FFF';
-    canvas.height=canvas.height;//清除画布
-    canvas.setAttribute('width',config.width*config.multiple);
-    canvas.setAttribute('height',config.height*config.multiple);
-    canvas.style.width = config.width + 'px';
-    canvas.style.height = config.height + 'px';
+  function createSealFaren(cfg){
+    var config = canvasCreate(cfg);
+    var context = config['context'];
+    var width = config['width'];
+    var height = config['height'];
 
-    var context = canvas.getContext('2d');
-    context.globalCompositeOperation = 'destination-over';
-
-    context.mozImageSmoothingEnabled = true;
-    context.webkitImageSmoothingEnabled = true;
-    context.msImageSmoothingEnabled = true;
-    context.imageSmoothingEnabled = true;
-
-    var scale = parseInt(config.multiple*5/3);
-    context.scale(scale,scale);
-
-    // 绘制印章边框
-    var width=canvas.width/(scale*2);
-    var height=canvas.height/(scale*2);
-
-    context.translate(0.5,0.5);// 平移到此位置,
-
-    var l = 76;
+    var l = parseInt(config.lineSize)||76;
     var x = width -l/2,y= height -l/2;
+    var safetyCount = 4;
+    var faRenSatefyLineArray = sealSizeParas['faRenSatefyLine'];
+    var satefyLineArray = sealSizeParas['satefyLineArray'];
+    if(config.satefyLineRepaint == true){
+      faRenSatefyLineArray.splice(0,faRenSatefyLineArray.length);
+      satefyLineArray.splice(0,satefyLineArray.length);
+      safetyCount = RandomNumBoth(4,5);
+      faRenSatefyLineArray.push(safetyCount);
+    }else{
+      safetyCount = faRenSatefyLineArray[0];
+    }
+
+
+
     //左
-    for(var i = 1; i < 6; i++) {
+    for(var i = 1; i < safetyCount; i++) {
         context.save();
         //设置分刻度的粗细
-        context.lineWidth = 0.5;
+        context.lineWidth = config.lineSafetySize;
         //设置分刻度的颜色
         context.strokeStyle = "#FFF";
         //设置或者重置画布的0,0点
-        context.translate(x,y);
+        context.translate(x,y*i*2);
         //设置旋转的角度
         context.rotate((0)*Math.PI/180);
         //开始绘制
         context.beginPath();
-        var rotate = RandomNumBoth(y+i*10,y+i*13);
-        context.moveTo(-3,rotate);
-        rotate = RandomNumBoth(y+i*10,y+i*13);
-        context.lineTo(2,rotate);
+
+        if(config.satefyLineRepaint || satefyLineArray.length==0){
+          var rotate1 = RandomNumBoth(y+i*10,y+i*13);
+          var rotate2 = RandomNumBoth(y+i*10,y+i*13);
+          context.moveTo(-3,rotate1);
+          context.lineTo(2,rotate2);
+
+          var parasArray = new Array(rotate1,rotate2);
+          satefyLineArray.push(parasArray);
+        }else{
+          var satefyLine = satefyLineArray[i-1];
+          //设置旋转的角度
+          context.moveTo(-3,satefyLine[0]);
+          context.lineTo(2,satefyLine[1]);
+        }
+
+
         context.stroke();
         context.closePath();
         context.restore();
     }
 
     //上
-    for(var i = 1; i < 6; i++) {
+    var safetyCountTop = safetyCount -1;
+    if(config.satefyLineRepaint == true){
+      safetyCount = RandomNumBoth(4,5);
+      faRenSatefyLineArray.push(safetyCount);
+    }else{
+      safetyCount = faRenSatefyLineArray[1];
+    }
+    for(var i = 1; i < safetyCount; i++) {
         context.save();
         //设置分刻度的粗细
-        context.lineWidth = 0.5;
+        context.lineWidth = config.lineSafetySize;
         //设置分刻度的颜色
         context.strokeStyle = "#FFF";
         //设置或者重置画布的0,0点
-        context.translate(x,y);
+        context.translate(x*i*2,y);
         //设置旋转的角度
         context.rotate((90)*Math.PI/180);
         //开始绘制
         context.beginPath();
 
-        var rotate = RandomNumBoth(y-i*12,y-i*15);
-        context.moveTo(-3,rotate);
-        rotate = RandomNumBoth(y-i*12,y-i*15);
-        context.lineTo(2,rotate);
+        if(config.satefyLineRepaint || satefyLineArray.length==0){
+          var rotate1 = RandomNumBoth(y-i*12,y-i*15);
+          var rotate2 = RandomNumBoth(y-i*12,y-i*15);
+          context.moveTo(-3,rotate1);
+          context.lineTo(2,rotate2);
+
+          var parasArray = new Array(rotate1,rotate2);
+          satefyLineArray.push(parasArray);
+        }else{
+          var satefyLine = satefyLineArray[safetyCountTop++];
+          //设置旋转的角度
+          context.moveTo(-3,satefyLine[0]);
+          context.lineTo(2,satefyLine[1]);
+        }
 
         context.stroke();
         context.closePath();
@@ -542,23 +499,41 @@ function createSealDang(config){
     }
 
     //右
-    for(var i = 1; i < 6; i++) {
+    var safetyCountRight = 0;
+    if(config.satefyLineRepaint == true){
+      safetyCount = RandomNumBoth(4,5);
+      faRenSatefyLineArray.push(safetyCount);
+    }else{
+      safetyCount = faRenSatefyLineArray[2];
+      safetyCountRight = faRenSatefyLineArray[0]+faRenSatefyLineArray[1]-2;
+    }
+    for(var i = 1; i < safetyCount; i++) {
         context.save();
         //设置分刻度的粗细
-        context.lineWidth = 0.5;
+        context.lineWidth = config.lineSafetySize;
         //设置分刻度的颜色
         context.strokeStyle = "#FFF";
         //设置或者重置画布的0,0点
-        context.translate(x+l,-y);
+        context.translate(x+l,-y+(i*4));
         //设置旋转的角度
         context.rotate((180)*Math.PI/180);
         //开始绘制
         context.beginPath();
 
-        var rotate = RandomNumBoth(y-i*13,y-i*15);
-        context.moveTo(-3,rotate);
-        rotate = RandomNumBoth(y-i*13,y-i*15);
-        context.lineTo(2,rotate);
+        if(config.satefyLineRepaint || satefyLineArray.length==0){
+          var rotate1 = RandomNumBoth(y-i*13,y-i*15);
+          var rotate2 = RandomNumBoth(y-i*13,y-i*15);
+          context.moveTo(-3,rotate1);
+          context.lineTo(2,rotate2);
+
+          var parasArray = new Array(rotate1,rotate2);
+          satefyLineArray.push(parasArray);
+        }else{
+          var satefyLine = satefyLineArray[safetyCountRight++];
+          //设置旋转的角度
+          context.moveTo(-3,satefyLine[0]);
+          context.lineTo(2,satefyLine[1]);
+        }
 
         context.stroke();
         context.closePath();
@@ -566,31 +541,53 @@ function createSealDang(config){
     }
 
     //下
-    for(var i = 1; i < 6; i++) {
+    var safetyCountBottom = 0;
+    if(config.satefyLineRepaint == true){
+      safetyCount = RandomNumBoth(4,5);
+      faRenSatefyLineArray.push(safetyCount);
+    }else{
+      safetyCount = faRenSatefyLineArray[3];
+      safetyCountBottom = faRenSatefyLineArray[0]+faRenSatefyLineArray[1]+faRenSatefyLineArray[2]-3;
+    }
+    for(var i = 1; i < safetyCount; i++) {
         context.save();
         //设置分刻度的粗细
-        context.lineWidth = 0.5;
+        context.lineWidth = config.lineSafetySize;
         //设置分刻度的颜色
         context.strokeStyle = "#FFF";
         //设置或者重置画布的0,0点
-        context.translate(x,y+l);
+        context.translate(x*i*2,y+l);
         //设置旋转的角度
         context.rotate((90)*Math.PI/180);
         //开始绘制
         context.beginPath();
 
-        var rotate = RandomNumBoth(y-i*12,y-i*14);
-        context.moveTo(-3,rotate);
-        rotate = RandomNumBoth(y-i*12,y-i*14);
-        context.lineTo(2,rotate);
+        if(config.satefyLineRepaint || satefyLineArray.length==0){
+          var rotate1 = RandomNumBoth(y-i*12,y-i*14);
+          var rotate2 = RandomNumBoth(y-i*12,y-i*14);
+          context.moveTo(-3,rotate1);
+          context.lineTo(2,rotate2);
+
+          var parasArray = new Array(rotate1,rotate2);
+          satefyLineArray.push(parasArray);
+        }else{
+          var satefyLine = satefyLineArray[safetyCountBottom++];
+          //设置旋转的角度
+          context.moveTo(-3,satefyLine[0]);
+          context.lineTo(2,satefyLine[1]);
+        }
 
         context.stroke();
         context.closePath();
         context.restore();
     }
-context.translate(0.5,0.5);// 平移到此位置,
+
+    sealSizeParas['satefyLineArray'] = satefyLineArray;
+    sealSizeParas['faRenSatefyLine'] = faRenSatefyLineArray;
+
+    // context.translate(0.5,0.5);// 平移到此位置,
     //使用strokeRect方法
-    context.lineWidth=7;
+    context.lineWidth=config.lineWidth||6;
     context.strokeStyle = config.sealColor||'#000';
     context.strokeRect(x,y,l,l);
     context.closePath();
@@ -598,7 +595,7 @@ context.translate(0.5,0.5);// 平移到此位置,
 
 
     var chars = config.company.split("");
-    context.font = 'normal normal  34px lishu';
+    context.font = 'normal normal  '+(config.sealunitSize)+'px lishu';
     context.textBaseline = 'middle';//设置文本的垂直对齐方式
     context.textAlign = 'center'; //设置文本的水平对对齐方式
     // context.lineWidth=1;
@@ -624,9 +621,6 @@ context.translate(0.5,0.5);// 平移到此位置,
 
     context.save();
 
-
-
-
     context.font = 'normal normal 900 '+(config.sealnoSize||12) +'px Microsoft YaHei';
     context.fillText(config.sealNum,width,height+l/2-4,67);
     context.restore();
@@ -637,55 +631,14 @@ context.translate(0.5,0.5);// 平移到此位置,
   /**
   * 共产主义青年团
   */
-  function createSealTuan(config){
-    var canvas = document.getElementById(config.canvasId);
-    canvas.style.display='block';
-    canvas.style.border='1px solid red';
-    canvas.height=canvas.height;//清除画布
-    canvas.setAttribute('width',config.width*config.multiple);
-    canvas.setAttribute('height',config.height*config.multiple);
-    canvas.style.width = config.width + 'px';
-    canvas.style.height = config.height + 'px';
+  function createSealTuan(cfg){
+      var config = canvasCreate(cfg);
+      safetyLineCreate(config);
+      var context = config['context'];
 
-    var context = canvas.getContext('2d');
-    context.translate(0.5,0.5);// 平移到此位置,
-    context.globalCompositeOperation = 'destination-over';
-
-    context.mozImageSmoothingEnabled = true;
-    context.webkitImageSmoothingEnabled = true;
-    context.msImageSmoothingEnabled = true;
-    context.imageSmoothingEnabled = true;
-
-
-    var scale = parseInt(config.multiple*5/3);
-    context.scale(scale,scale);
-
-    // 绘制印章边框
-    var width=canvas.width/(scale*2);
-    var height=canvas.height/(scale*2);
-
-    for(var i = 0; i < config.lineNum; i++) {
-        context.save();
-        //设置分刻度的粗细
-        context.lineWidth = 0.5;
-        //设置分刻度的颜色
-        context.strokeStyle = "#FFF";
-        //设置或者重置画布的0,0点
-        context.translate(width,height);
-        var rotate = RandomNumBoth(0,180/config.lineNum);
-        //设置旋转的角度
-        context.rotate((i*360/config.lineNum+rotate)*Math.PI/180);
-        //开始绘制
-        context.beginPath();
-        var x1 = RandomNumBoth(0,5);
-        context.moveTo(0,(-config.lineSize-2)+(Math.random()));
-        var x2 = RandomNumBoth(-10,10);
-        context.lineTo(x2,(-config.lineSize+1)+(Math.random()*3));
-        context.stroke();
-        context.closePath();
-        context.restore();
-    }
-
+      // 绘制印章边框
+      var width=config.width;
+      var height=config.height;
 
       context.lineWidth=config.lineWidth;
       context.strokeStyle=config.sealColor||'#000';
@@ -704,7 +657,7 @@ context.translate(0.5,0.5);// 平移到此位置,
       context.stroke();
 
       //画五角星
-      create5star(context,width,height,config.star5||20,"#000",0);
+      create5star(context,width,height,config.star5||20,config.sealColor||"#000",0);
 
       // 绘制印章名称
       context.font = 'bold '+(config.sealnameSize||17)+'px serif';
@@ -769,32 +722,6 @@ context.translate(0.5,0.5);// 平移到此位置,
           context.restore();
       }
 
-
-      //绘制五角星
-      /**
-       * 创建一个五角星形状. 该五角星的中心坐标为(sx,sy),中心到顶点的距离为radius,rotate=0时一个顶点在对称轴上
-       * rotate:绕对称轴旋转rotate弧度
-       */
-      function create5star(context,sx,sy,radius,color,rotato){
-          context.save();
-          context.translate(0.5,0.5);// 平移到此位置,
-          context.fillStyle=color;
-          context.translate(sx,sy);//移动坐标原点
-          context.rotate(Math.PI+rotato);//旋转
-          context.beginPath();//创建路径
-          var x = Math.sin(0);
-          var y= Math.cos(0);
-          var dig = Math.PI/5 *4;
-          for(var i = 0;i< 5;i++){//画五角星的五条边
-           var x = Math.sin(i*dig);
-           var y = Math.cos(i*dig);
-           context.lineTo(x*radius,y*radius);
-          }
-          context.closePath();
-          context.stroke();
-          context.fill();
-          context.restore();
-      }
   }
 
 
@@ -860,7 +787,8 @@ context.translate(0.5,0.5);// 平移到此位置,
      ctx.stroke();
   }
 
-  function drawLine(context,config,width,height){
+ /*画防伪线*/
+  function drawSafetyLine(context,config,width,height){
     //---------------------------------------------------------
     var l = 190;
     var x = width -l/2,y= height -l/2;
@@ -1107,10 +1035,7 @@ context.translate(0.5,0.5);// 平移到此位置,
 /**
  * 发票专用章
 */
-function fapiao (config) {
-
-    config['company'] = '公司印诺系统集成有限公司';
-    config['name'] = '发票专用章';
+function createSealFapiao (config) {
 
     var canvas = document.getElementById(config.canvasId);
     canvas.style.display='block';
@@ -1130,7 +1055,6 @@ function fapiao (config) {
     context.msImageSmoothingEnabled = true;
     context.imageSmoothingEnabled = true;
 
-
     var scale = parseInt(config.multiple*5/3);
     context.scale(scale,scale);
 
@@ -1139,22 +1063,18 @@ function fapiao (config) {
     var height=canvas.height/(scale*2);
 
 
-
-    drawLine(context,config, width, height);
+    drawSafetyLine(context,config, width, height);
     context.translate(width/2,height/2);// 平移到此位置,
-    drawEllipse(config,context,6, width/2, height/2, width-4, (width-4)/4*3);
-
+    var lineSize = parseInt(config.lineSize||96);
+    drawEllipse(config,context,config.lineWidth||6, width/2, height/2, lineSize, (lineSize)/4*3);
 
     //---------------------------------------------------------
     var RAD_ANG = 57.295779513082320876798154814105;
-    var endAngle = 0;
-    var startAngle = 180;
-    if (endAngle < startAngle)
-           endAngle += 360;
-//     if (endAngle < startAngle)
-//         endAngle += 360;
-
-    var padding = 10;
+    var endAngle = parseInt(config.sealrotateSizeFapiao);
+    var startAngle = parseInt(config.sealangleSizeFapiao);
+    if (endAngle < startAngle){
+      endAngle += 360;
+    }           
 
     var chars = config.company.split("");
     var length = config.company.length;// 字数
@@ -1167,7 +1087,7 @@ function fapiao (config) {
     var y0 = height / 2;
 
     context.translate(0,0);// 平移到此位置,
-    context.font = 'bold '+(30)+'px serif ';
+    context.font = 'bold '+(config.sealunitSize||30)+'px serif ';
     context.fillStyle = config.sealColor||"#000";
 
     for (var i = 0; i < length; i++){
@@ -1187,57 +1107,58 @@ function fapiao (config) {
         context.translate(x, y);// 平移到此位置,此时字和x轴垂直
         context.rotate(kAngle*Math.PI/180);// 旋转90度,让字平行于x轴
 
-        context.fillText(c,-7, 4,15);//-7控制初始角度
+        context.fillText(c,-7, config.sealunitSpan||4,config.sealunitHeight||15);//-7控制初始角度
         context.restore();
-
-
     }
 
   //---------------------------------------------------------
     context.save();
     //横排编号
-    context.font = 'bold '+(26)+'px Microsoft YaHei';
+    context.font = 'bold '+(config.sealFapiaoFont||26)+'px Microsoft YaHei';
     context.textBaseline = 'middle';//设置文本的垂直对齐方式
     context.textAlign = 'center'; //设置文本的水平对对齐方式
     context.fillStyle = config.sealColor||'#000';
 
-    var sealnameAdjust = parseInt(config.sealnameAdjust||40);
-    context.fillText('92130803MA09JAY10H',width/2,height/2,120);
+    var sealFapiaoAdjust = parseInt(config.sealFapiaoAdjust||120);
+    context.fillText(config.sealNumFapiao,width/2,height/2,sealFapiaoAdjust);
     context.restore();
     context.save();
 
     //发票专用章
-    context.font = 'bold '+(30)+'px serif';
+    context.font = 'bold '+(config.sealnameSize||30)+'px serif';
     context.textBaseline = 'middle';//设置文本的垂直对齐方式
     context.textAlign = 'center'; //设置文本的水平对对齐方式
     context.fillStyle = config.sealColor||'#000';
 
-    var sealnameAdjust = parseInt(config.sealnameAdjust||40);
-    context.fillText(config.name,width/2,height/1.2,80);
+    var sealnameAdjust = parseInt(config.sealnameAdjust||83);
+    var sealnameFontAdjust = parseInt(config.sealnameFontAdjust||80);
+
+    context.fillText(config.name,width/2,sealnameAdjust,sealnameFontAdjust);
     context.restore();
     context.save();
 
-
     // 绘制编号
     context.translate(width/2,height/5.5);// 平移到此位置,
-    config['sealNo'] = 'CDY130801130000001';
-    context.font = 'normal normal 900 '+(8) +'px Microsoft YaHei';
+    context.font = 'normal normal 900 '+(config.sealnoSize||6) +'px Microsoft YaHei';
     context.fillStyle = config.sealColor||'#000';
     var count2 = config.sealNum.length;// 字数
-    var angle2 = Math.PI/(3.5*(count2 - 1));// 字间角度
+    var angle2 = config.sealnoAngle||Math.PI/(3*(count2 - 1));// 字间角度
     var chars2 = config.sealNum.split("");
+
+    var sealnoSpan = parseInt(config.sealnoSpan);
 
     var c2;
     for (var i = count2-1; i >= 0; i--){
         c2 = chars2[i];// 需要绘制的字符
-        if(i==count2-1)
-            context.rotate(Math.PI/2.75);
-        else
+        if(i==count2-1){
+            context.rotate(config.sealnorotateSize||Math.PI/2.9);
+        }else{
           context.rotate(angle2);
+        }
         context.save();
          context.translate(90, 0);// 平移到此位置,此时字和x轴垂直
         context.rotate(270*Math.PI/180);// 旋转90度,让字平行于x轴
-        context.fillText(c2,0, 8,50);// 此点为字的中心点
+        context.fillText(c2,0, sealnoSpan||8,50);// 此点为字的中心点
         context.restore();
     }
     context.save();
@@ -1254,23 +1175,23 @@ function baoguanBottomText (config,context,width,height) {
     var startAngle = 180;
     var endAngle =0;
 
-    config['company'] = 'CHENG DE CAST MINING LNVESTMENT CO., LTD';
-    var charsTemp = config.company.split("");
+    // config['sealBaoguanEnglish'] = 'CHENG DE CAST MINING LNVESTMENT CO., LTD';
+    var charsTemp = config.sealBaoguanEnglish.split("");
     var temp = '';
-    for (var i = 0; i < config.company.length; i++){
+    for (var i = 0; i < config.sealBaoguanEnglish.length; i++){
       var c = charsTemp[i];// 需要绘制的字符
       if(i < 7 && c !=' '){
         temp += c + ' ';
-      }else if(i > config.company.length-5 && c !=' '){
+      }else if(i > config.sealBaoguanEnglish.length-5 && c !=' '){
         temp += c + ' ';
       }else{
         temp += c;
       }
     }
-    config['company'] = temp.replace('CO','C O');
+    config.sealBaoguanEnglish = temp.replace('CO','C O');
 
-    var chars = config.company.split("");
-    var length = config.company.length;// 字数
+    var chars = config.sealBaoguanEnglish.split("");
+    var length = config.sealBaoguanEnglish.length;// 字数
 
     var aAngle = (1 * (endAngle - startAngle)) / Math.max(length-1, 1);
 
@@ -1313,9 +1234,6 @@ function baoguanBottomText (config,context,width,height) {
 */
 function baoguan (config) {
 
-    config['company'] = '承德铸成矿业投资有限公司';
-    config['name'] = '报关专用章';
-
     var canvas = document.getElementById(config.canvasId);
     canvas.style.display='block';
     canvas.style.border='1px solid red';
@@ -1342,22 +1260,19 @@ function baoguan (config) {
     var width=canvas.width/(scale*2);
     var height=canvas.height/(scale*2);
 
-
-
-    drawLine(context,config, width, height);
+    drawSafetyLine(context,config, width, height);
     context.translate(width/2,height/2);// 平移到此位置,
-    drawEllipse(config,context,6, width/2, height/2, width-4, (width-4)/25*18);
+    var lineSize = parseInt(config.lineSize||96);
+    drawEllipse(config,context,config.lineWidth||6, width/2, height/2, lineSize, (lineSize)/25*18);
 
     drawEllipse(config,context,3, width/2, height/2, width/3*2-5, (width/3*2)/25*18-12);
 
     //---------------------------------------------------------
     var RAD_ANG = 57.295779513082320876798154814105;
-    var endAngle = -20;
-    var startAngle = -160;
+    var endAngle = parseInt(config.sealrotateSizeFapiao);
+    var startAngle = parseInt(config.sealangleSizeFapiao);
     if (endAngle < startAngle)
            endAngle += 360;
-//     if (endAngle < startAngle)
-//         endAngle += 360;
 
     var padding = 10;
 
@@ -1372,7 +1287,7 @@ function baoguan (config) {
     var y0 = height / 2;
 
     context.translate(0,0);// 平移到此位置,
-    context.font = 'bold '+(26)+'px serif ';
+    context.font = 'bold '+(config.sealunitSize||26)+'px serif ';
     context.fillStyle = config.sealColor||"#000";
 
     for (var i = 0; i < length; i++){
@@ -1392,7 +1307,7 @@ function baoguan (config) {
         context.translate(x, y);// 平移到此位置,此时字和x轴垂直
         context.rotate(kAngle*Math.PI/180);// 旋转90度,让字平行于x轴
 
-        context.fillText(c,-7, 3,12);//-7控制初始角度
+        context.fillText(c,-7, config.sealunitSpan||3,config.sealunitHeight||12);//-7控制初始角度
         context.restore();
 
 
@@ -1401,13 +1316,15 @@ function baoguan (config) {
   //---------------------------------------------------------
     context.save();
     //横排编号
-    context.font = 'bold '+(32)+'px serif';
+    context.font = 'bold '+(config.sealnameSize||32)+'px serif';
     context.textBaseline = 'middle';//设置文本的垂直对齐方式
     context.textAlign = 'center'; //设置文本的水平对对齐方式
     context.fillStyle = config.sealColor||'#000';
 
-    var sealnameAdjust = parseInt(config.sealnameAdjust||40);
-    context.fillText(config.name,width/2,height/2,100);
+    var sealnameAdjust = parseInt(config.sealnameAdjust||50);
+    var sealnameFontAdjust = parseInt(config.sealnameFontAdjust||100);
+
+    context.fillText(config.name,width/2,sealnameAdjust,sealnameFontAdjust);
     context.restore();
     context.save();
 
